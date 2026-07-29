@@ -1,0 +1,262 @@
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:white;
+}
+
+/* ÁREA DE TRABALHO */
+h1{
+  font-family: Arial;
+  text-align: center;
+  font-size: 20px;
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+#linhaPainel{
+  margin: 5px 100px 16px 100px; /* cima, direita, baixo, esquerda */
+  border: none;
+  height:1.5px;
+  background:#151414;
+}
+
+
+/* NAVBAR */
+.navbar{
+display:flex;
+align-items:center;
+background: linear-gradient(to right, #1c3426, #649e6b);
+color:white;
+padding:2px 20px;
+position:relative;
+z-index:10;
+}
+
+.logo{
+font-size:25px;
+font-weight:bold;
+margin-right:40px;
+
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 10px; 
+}
+
+.nav-buttons a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 4px 8px; 
+    border-radius: 30pt;
+    transition: background-color 0.3s;
+    display: inline-block; 
+}
+
+.nav-buttons a:hover {
+    background: #357640;
+}
+
+.search-area{
+    position: relative;
+    margin-left: auto;
+    margin-right: 80px;
+}
+
+.search-area input{
+    width: 280px;
+    padding: 8px 35px 8px 12px;
+    border-radius: 20px;
+    border: none;
+}
+
+.search-area input:focus{
+    outline: none;
+}
+
+.search-icon{
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #555;
+    font-size: 16px;
+}
+
+.user{
+display:flex;
+align-items:center;
+margin-right: 5px;
+gap:10px;
+}
+
+.user-photo{
+width:35px;
+height:35px;
+border-radius:50%;
+object-fit:cover;
+}
+
+/* Container principal do menu do usuário */
+.user-menu-container {
+    position: relative;
+    padding: 10px;
+    cursor: pointer;
+}
+
+/* O menu escondido */
+.user-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%; 
+    right: 0;
+    background-color: white;
+    min-width: 180px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    z-index: 1000;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+/* Links dentro do menu */
+.user-dropdown a {
+    display: block;
+    padding: 12px 16px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+/* Efeito ao passar o mouse nos links */
+.user-dropdown a:hover {
+    background-color: #f4f7e9;
+    color: #357640;
+}
+
+.user-dropdown a.btn-sair:hover {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.user-menu-container:hover .user-dropdown {
+    display: block;
+}
+
+
+
+/* MENU LATERAL */
+.sidebar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    width: 235px;
+    height: calc(100vh - 56px);
+    background: #f4f7e9;
+    padding-top: 20px;
+    overflow-y: auto;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #333;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.sidebar li a i {
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+    color: #333;
+}
+
+.sidebar li a span {
+    white-space: nowrap;
+    color: #333;
+}
+
+.sidebar li a:hover {
+    background-color: rgba(162, 207, 158, 0.3);
+}
+
+.sidebar li.active a span {
+    background: #a2cf9e;
+    padding: 4px 10px;
+    border-radius: 25px;
+}
+
+.sidebar li.active a i {
+    color: #333;
+}
+
+.sidebar hr {
+    margin: 15px 20px;
+    border: none;
+    height: 1.3px;
+    background: #151414;
+}
+
+
+/* AREA PRINCIPAL */
+.content{
+margin-left:240px;
+padding:30px;
+}
+
+/* AREA CLIENTES */
+/* Cores do Protótipo */
+:root {
+    --verde-rp: #357640;
+    --fundo-sidebar: #f4f7e9;
+    --cor-linha: #000000;
+}
+
+.linha-titulo {
+    width: 60%;
+    height: 3px;
+    background-color: var(--cor-linha);
+    margin-top: 5px;
+}
+
+.card-cliente {
+    background-color: #fcfdf7;
+    border-radius: 15px;
+    border: none;
+    border-left: 8px solid transparent;
+    transition: 0.3s;
+}
+
+.card-cliente:hover {
+    border-left: 8px solid var(--verde-rp);
+    transform: translateX(5px);
+}
+
+.text-success {
+    color: #357640 !important;
+}
+
+/* Sidebar Estilo Protótipo */
+.sidebar {
+    width: 250px;
+    min-height: 100vh;
+    background-color: var(--fundo-sidebar);
+    padding: 20px 0;
+}

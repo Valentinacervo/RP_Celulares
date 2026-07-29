@@ -1,0 +1,23 @@
+{
+  "name": "sistema",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^17.4.2",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "express-rate-limit": "^8.6.1",
+    "express-session": "^1.19.0",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "multer": "^2.1.1",
+    "mysql2": "^3.22.4",
+    "nodemailer": "^8.0.10"
+  }
+}
