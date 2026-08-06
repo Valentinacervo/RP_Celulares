@@ -130,7 +130,6 @@ object-fit:cover;
     transition: 0.2s;
 }
 
-/* Efeito ao passar o mouse nos links */
 .user-dropdown a:hover {
     background-color: #f4f7e9;
     color: #357640;
@@ -195,12 +194,6 @@ object-fit:cover;
 
 .sidebar li a:hover {
     background-color: rgba(162, 207, 158, 0.3);
-}
-
-.sidebar li.active a span {
-    background: #a2cf9e;
-    padding: 4px 10px;
-    border-radius: 25px;
 }
 
 .sidebar li.active a i {

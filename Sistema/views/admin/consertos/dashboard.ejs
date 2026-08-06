@@ -12,10 +12,102 @@
 
 <body>
     <!-- NAVBAR -->
-    <%- include("../partials/navbar") %>
+    <header class="navbar">
+    <div class="logo">
+        RP 
+    </div>
 
-    <!-- MENU LATERAL -->
-    <%- include("../partials/sidebarConsertos") %>
+    <nav class="nav-buttons">
+        <a href="/admin">Consertos</a>
+        <a href="/admin/produtos">Produtos</a>
+        <a href="/admin/clientes">Clientes</a>
+    </nav>
+    
+    <div class="search-area">
+        <input type="text" id="txtBusca" placeholder="Procurar conserto">
+        <i class="bi bi-search search-icon"></i>
+    </div>
+
+    <!-- Área do Admin com Dropdown-->
+    <div class="user-menu-container">
+        <div class="user">
+            <img src="<%= usuario.foto || '/images/valentina.jpg' %>" class="user-photo" id="fotoPerfil" alt="Foto do usuário">
+            <span>Admin - Rodrigo </span>
+        </div>
+        
+        <div class="user-dropdown">
+            <a href="#" id="btnMudarFoto">
+                <i class="bi bi-camera-fill"></i> Mudar foto
+            </a>
+            <a href="/logout" class="btn-sair">
+                <i class="bi bi-box-arrow-right"></i> Sair do sistema
+            </a>
+        </div>
+    </div>
+
+    <!-- FORMULÁRIO ESCONDIDO PARA UPLOAD -->
+    <form id="formFoto" action="/admin/upload-foto" method="POST" enctype="multipart/form-data" style="display: none;">
+        <input type="file" id="inputFoto" name="foto" accept="image/*">
+    </form>
+</header>
+
+<script>
+    // Quando clicar no link "Mudar foto"
+    document.getElementById('btnMudarFoto').addEventListener('click', function(e) {
+        e.preventDefault(); 
+        document.getElementById('inputFoto').click(); 
+    });
+
+    // Quando o admin escolher o arquivo na "aba do computador"
+    document.getElementById('inputFoto').addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            document.getElementById('formFoto').submit();
+        }
+    });
+</script>
+
+   <!-- MENU LATERAL -->
+<aside class="sidebar">
+    <ul>
+        <li> 
+            <a href="/admin">
+                <i class="bi bi-house-fill"></i>
+                <span>Inicio</span>
+            </a>
+        </li>
+        <li>
+            <a href="/destacados">
+                <i class="bi bi-star-fill"></i>
+                <span>Destacados</span>
+            </a>
+        </li>
+        <hr>
+        <li>
+            <a href="/adicionarconserto">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span>Adicionar conserto</span>
+            </a>
+        </li>
+        <li>
+            <a href="/todosconsertos">
+                <i class="bi bi-wrench"></i>
+                <span>Todos os consertos</span>
+            </a>
+        </li>
+        <li>
+            <a href="/consertospendentes">
+                <i class="bi bi-hourglass-split"></i>
+                <span>Consertos pendentes</span>
+            </a>
+        </li>
+        <li>
+            <a href="/consertosconcluidos">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Consertos concluídos</span>
+            </a>
+        </li>
+    </ul>
+</aside>
 
     <!-- ÁREA PRINCIPAL -->
     <main class="content">

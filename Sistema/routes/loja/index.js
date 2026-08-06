@@ -203,8 +203,10 @@ router.post('/login', async (req, res) => {
 
       const funcionario = funcionarios[0];
 
-      // Se a senha estiver em texto puro
-      if (senha === funcionario.senha) {
+      // Verifica a senha com bcrypt (hash)
+      const senhaAdminCorreta = await bcrypt.compare(senha, funcionario.senha);
+
+      if (senhaAdminCorreta) {
 
         req.session.usuarioLogado = funcionario;
 

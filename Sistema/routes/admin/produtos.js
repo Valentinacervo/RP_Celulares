@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const db = require('../../db'); // Importa a conexão com o banco
+const db = require('../../db');
 
 // Middleware de proteção
 function verificarAutenticacao(req, res, next) {
@@ -10,22 +10,61 @@ function verificarAutenticacao(req, res, next) {
   res.redirect('/login');
 }
 
-/* GET lista de produtos */
-router.get('/', verificarAutenticacao, async function(req, res, next) {
+router.use(verificarAutenticacao);
+
+/* GET tela inicial de produtos */
+router.get('/', async (req, res, next) => {
   try {
-    const [rows] = await db.query('SELECT * FROM produto ORDER BY id_produto DESC');
-    res.render('admin/produtos/lista', { 
-      title: 'Lista de Produtos', 
-      produtos: rows 
+    const categoriaId = req.query.categoria || null;
+
+    const [categorias] = await db.query(
+      'SELECT * FROM categoria ORDER BY descricao'
+    );
+
+    let query = 'SELECT * FROM produto WHERE ativo = 1';
+    const params = [];
+
+    if (categoriaId) {
+      query += ' AND id_categoria = ?';
+      params.push(categoriaId);
+    }
+
+    query += ' ORDER BY vendas DESC LIMIT 3';
+
+    const [produtos] = await db.query(query, params);
+
+    res.render('admin/produtos/produtosAdmin', {
+      title: 'Produtos',
+      usuario: req.session.usuarioLogado,
+      categorias,
+      produtos,
+      paginaAtual: 'inicio',
+      categoriaSelecionada: categoriaId
     });
+
   } catch (err) {
     next(err);
   }
 });
 
-/* GET formulário de cadastro */
-router.get('/cadastro', verificarAutenticacao, function(req, res, next) {
-  res.render('admin/produtos/cadastro', { title: 'Cadastro de Produtos' });
+/* GET formulário de adicionar produto */
+router.get('/adicionar', async (req, res, next) => {
+  try {
+    const [categorias] = await db.query(
+      'SELECT * FROM categoria ORDER BY descricao'
+    );
+
+    res.render('admin/produtos/cadastro', {
+      title: 'Adicionar produto',
+      usuario: req.session.usuarioLogado,
+      categorias,
+      paginaAtual: 'adicionar-produto',
+      categoriaSelecionada: null
+    });
+
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;
