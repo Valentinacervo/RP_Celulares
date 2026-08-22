@@ -16,44 +16,62 @@
 
     <%- include("partials/navbar1Loja") %>
 
-    <!-- CARROSSEL -->
-    <div class="container-banner">
+<!-- CARROSSEL -->
+<div class="container-banner">
+
+    <% if (banners.length > 0) { %>
 
         <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
 
             <div class="carousel-inner">
 
-                <div class="carousel-item active">
-                    <img src="/images/propaganda2.png" class="d-block w-100" alt="Banner 1">
-                </div>
+                <% banners.forEach((banner, index) => { %>
 
-                <div class="carousel-item">
-                    <img src="/images/propaganda1.png" class="d-block w-100" alt="Banner 2">
-                </div>
+                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                        <img 
+                            src="/images/banners/<%= banner.imagem %>" 
+                            class="d-block w-100" 
+                            alt="Banner promocional">
+                    </div>
+
+                <% }) %>
 
             </div>
 
-            <!-- Botão anterior -->
-            <button class="carousel-control-prev"
-                    type="button"
-                    data-bs-target="#carouselExample"
+            <% if (banners.length > 1) { %>
+
+                <button 
+                    class="carousel-control-prev" 
+                    type="button" 
+                    data-bs-target="#carouselExample" 
                     data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
 
-                <span class="carousel-control-prev-icon"></span>
-
-            </button>
-
-            <!-- Botão próximo -->
-            <button class="carousel-control-next"
-                    type="button"
-                    data-bs-target="#carouselExample"
+                <button 
+                    class="carousel-control-next" 
+                    type="button" 
+                    data-bs-target="#carouselExample" 
                     data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
 
-                <span class="carousel-control-next-icon"></span>
+            <% } %>
 
-            </button>
         </div>
-    </div>
+
+    <% } else { %>
+
+        <div class="banner-sem-conteudo">
+            <img 
+                src="/images/banner-erro.png" 
+                class="d-block w-100" 
+                alt="Não há nenhum banner adicionado no carrossel no momento">
+        </div>
+
+    <% } %>
+
+</div>
 
 <!-- MENU LATERAL -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="menuLateral">
@@ -95,54 +113,14 @@
     <h5 class="menu-titulo">Categorias</h5>
 
     <ul class="menu-lista">
-      <a href="/categoria/celulares" class="menu-item-link">
-        <li>
-          Celulares
-          <i class="bi bi-chevron-right"></i>
-        </li>
-      </a>
-
-      <a href="/categoria/computadores" class="menu-item-link">
-        <li>
-          Computadores
-          <i class="bi bi-chevron-right"></i>
-        </li>
-      </a>
-
-      <a href="/categoria/fones" class="menu-item-link">
-        <li>
-          Fones de Ouvido
-          <i class="bi bi-chevron-right"></i>
-        </li>
-      </a>
-
-      <a href="/categoria/carregadores" class="menu-item-link">
-        <li>
-          Cabos e Carregadores
-          <i class="bi bi-chevron-right"></i>
-        </li>
-      </a>
-
-      <a href="/categoria/smartwatches" class="menu-item-link">
-        <li>
-          Smartwatches
-          <i class="bi bi-chevron-right"></i>
-        </li>
-      </a>
-
-      <a href="/categoria/acessorios" class="menu-item-link">
-        <li>
-          Acessórios
-          <i class="bi bi-chevron-right"></i>
-        </li>
-      </a>
-
-      <a href="/categoria/adaptadores" class="menu-item-link">
-        <li>
-          Adaptadores
-          <i class="bi bi-chevron-right"></i>
-        </li>
-      </a>
+      <% categoriasMenu.forEach(categoria => { %>
+        <a href="/produtos?categoria=<%= categoria.id_categoria %>" class="menu-item-link">
+          <li>
+            <%= categoria.nome %>
+            <i class="bi bi-chevron-right"></i>
+          </li>
+        </a>
+      <% }) %>
     </ul>
 
     <hr>
@@ -166,6 +144,7 @@
     </ul>
   </div>
 </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 

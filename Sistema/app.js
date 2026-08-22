@@ -6,6 +6,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const db = require('./db');
 
 
 // --- ROTAS DA LOJA ONLINE ---
@@ -43,6 +44,18 @@ app.use(session({
   }
 }));
 
+// --- CATEGORIAS DISPONÍVEIS (menu lateral dinâmico) ---
+app.use(async (req, res, next) => {
+  try {
+    const [categorias] = await db.query('SELECT * FROM categoria ORDER BY nome');
+    res.locals.categoriasMenu = categorias;
+    next();
+  } catch (err) {
+    res.locals.categoriasMenu = [];
+    next();
+  }
+});
+
 // --- CONFIGURAÇÃO DAS URLs DA LOJA ---
 app.use('/', lojaIndexRouter);
 app.use('/conserto', lojaConsertoRouter);
@@ -51,8 +64,8 @@ app.use('/perfil', lojaPerfilRouter);
 
 // --- CONFIGURAÇÃO DAS URLs DO ADMIN ---
 app.use('/admin', adminDashboardRouter);
-app.use('/admin/clientes', adminClientesRouter);
 app.use('/admin/produtos', adminProdutosRouter);
+app.use('/admin/clientes', adminClientesRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

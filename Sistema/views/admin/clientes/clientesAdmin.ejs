@@ -1,63 +1,132 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Clientes - RP Celulares</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <title>RP Celulares</title>
     <link rel="stylesheet" href="/stylesheets/admin.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
-<body class="bg-light">
 
-    <%- include("../partials/navbar" ) %>
+<body>
+<!--NAVBAR-->
+<header class="navbar">
+    <div class="logo">RP</div>
 
-    <div class="d-flex">
-        <%- include("../partials/sidebarClientes") %>
+    <nav class="nav-buttons">
+        <a href="/admin">Consertos</a>
+        <a href="/admin/produtos">Produtos</a>
+        <a href="/admin/clientes" class="active">Clientes</a>
+    </nav>
 
-        <main class="content flex-grow-1 p-4">
-            <div class="text-center mb-4">
-                <h2 class="fw-bold">Gestão de Clientes</h2>
-                <div class="linha-titulo mx-auto"></div>
-            </div>
+    <form class="search-area" action="/admin/clientes" method="GET">
+        <input type="text" name="busca" value="<%= busca %>" placeholder="Buscar por código, nome ou telefone">
+        <i class="bi bi-search search-icon"></i>
+    </form>
 
-            <div class="container-cards">
-                <% if (clientes && clientes.length > 0) { %>
-                    <% clientes.forEach(cliente => { %>
-                        <div class="card-cliente shadow-sm mb-4 p-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h4 class="mb-1 fw-bold"><%= cliente.nome %> <span class="text-muted fs-6 ms-2">#CLI<%= String(cliente.id).padStart(3, '0') %></span></h4>
-                                    <div class="info-contato d-flex gap-4 mt-2">
-                                        <span><i class="bi bi-telephone"></i> <%= cliente.telefone || '(00) 0000-0000' %></span>
-                                        <span><i class="bi bi-envelope"></i> <%= cliente.email || 'email@exemplo.com' %></span>
-                                    </div>
-                                    <div class="mt-2 text-muted">
-                                        <i class="bi bi-geo-alt"></i> <%= cliente.endereco || 'Endereço não cadastrado' %>
-                                    </div>
-                                </div>
-                                <button class="btn btn-outline-dark btn-sm rounded-pill px-3">
-                                    <i class="bi bi-eye"></i> Ver Detalhes
-                                </button>
-                            </div>
-                            
-                            <hr class="my-3">
-                            
-                            <div class="servico-info">
-                                <p class="mb-1"><strong>Último serviço:</strong> <%= cliente.ultimo_servico || 'Nenhum serviço registrado' %></p>
-                                <h3 class="text-success fw-bold mt-2">R$ <%= cliente.valor_total || '0,00' %></h3>
-                            </div>
-                        </div>
-                    <% }); %>
-                <% } else { %>
-                    <div class="alert alert-info text-center">Nenhum cliente encontrado.</div>
-                <% } %>
-            </div>
-        </main>
+    <div class="user-menu-container">
+        <div class="user">
+            <img src="<%= usuario.foto || '/images/valentina.jpg' %>" class="user-photo" id="fotoPerfil" alt="Foto do usuário">
+            <span>Admin - Rodrigo </span>
+        </div>
+        <div class="user-dropdown">
+            <a href="#" id="btnMudarFoto">
+                <i class="bi bi-camera-fill"></i> Mudar foto
+            </a>
+            <a href="/logout" class="btn-sair">
+                <i class="bi bi-box-arrow-right"></i> Sair do sistema
+            </a>
+        </div>
     </div>
 
+    <form id="formFoto" action="/admin/upload-foto" method="POST" enctype="multipart/form-data" style="display: none;">
+        <input type="file" id="inputFoto" name="foto" accept="image/*">
+    </form>
+</header>
+
+
+<main class="content">
+    <div class="titulo-pagina">
+        <h1>Gestão de Clientes</h1>
+
+        <a href="/admin/clientes/adicionar" class="btn-adicionar-cliente">
+            <i class="bi bi-plus-circle-fill"></i>
+            Adicionar cliente
+        </a>
+    </div>
+
+    <hr id="linhaPainel">
+
+    <% if (clientes.length === 0) { %>
+        <p class="sem-produtos">Nenhum cliente encontrado.</p>
+    <% } else { %>
+        <div class="clientes-lista">
+            <% clientes.forEach(cliente => { %>
+                <% const codigo = 'CLI' + String(cliente.id_cliente).padStart(3, '0'); %>
+
+                <div class="cliente-card">
+
+                    <div class="cliente-topo">
+                        <div class="cliente-nome-codigo">
+                            <strong><%= cliente.nome %></strong>
+                            <span class="cliente-codigo">#<%= codigo %></span>
+                        </div>
+
+                        <a href="/admin/clientes/<%= cliente.id_cliente %>" class="btn-ver-detalhes">
+                            <i class="bi bi-eye-fill"></i> Ver Detalhes
+                        </a>
+                    </div>
+
+                    <div class="cliente-contato">
+                        <% 
+                        const tel = (cliente.telefone || '').replace(/\D/g, '');
+                        const telFormatado = tel.length === 11 
+                            ? tel.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
+                            : tel.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                        %>
+
+                        <span>
+                            <i class="bi bi-telephone-fill"></i>
+                            <%= telFormatado %>
+                        </span>
+
+                        <span>
+                            <i class="bi bi-envelope-fill"></i>
+                            <%= cliente.email %>
+                        </span>
+                    </div>
+                    
+                    <% if (cliente.rua) { %>
+                        <div class="cliente-endereco">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <%= cliente.rua %>, <%= cliente.numero %> – <%= cliente.bairro %>, <%= cliente.cidade %><% if (cliente.uf) { %>/<%= cliente.uf %><% } %>
+                        </div>
+                    <% } %>
+
+                    <hr class="cliente-linha">
+
+                    <div class="cliente-servico">
+                        Último serviço: Nenhum serviço registrado
+                    </div>
+
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</main>
+
+<script>
+    document.getElementById('btnMudarFoto').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('inputFoto').click();
+    });
+
+    document.getElementById('inputFoto').addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            document.getElementById('formFoto').submit();
+        }
+    });
+</script>
 </body>
 </html>

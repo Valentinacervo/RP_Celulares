@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const multer = require('multer'); 
-const path = require('path');  
+const path = require('path');
+const fs = require('fs');
 
 /* Configuração do Multer (upload de foto) */
 const storage = multer.diskStorage({
@@ -38,6 +39,18 @@ router.post('/upload-foto', verificarAutenticacao, upload.single('foto'), functi
   if (!req.file) {
     return res.status(400).send('Nenhuma foto foi enviata.');
   }
+
+  // Apaga a foto anterior, se existir e não for a imagem padrão
+  const fotoAntiga = req.session.usuarioLogado.foto;
+  if (fotoAntiga && !fotoAntiga.includes('valentina.jpg')) {
+    const caminhoFotoAntiga = path.join(__dirname, '..', '..', 'public', fotoAntiga);
+    fs.unlink(caminhoFotoAntiga, (err) => {
+      if (err) {
+        console.error('Não foi possível apagar a foto antiga:', err.message);
+      }
+    });
+  }
+
   const caminhoFoto = '/images/perfil/' + req.file.filename;
   req.session.usuarioLogado.foto = caminhoFoto;
 

@@ -6,11 +6,6 @@ const crypto = require('crypto'); // Gera tokens aleatórios
 const sendEmail = require('../../config/email'); // Manda email para usuário
 const { templateCodigoRecuperacao } = require('../../config/emailTemplates');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('loja/index', { title: 'RP Celulares - Home' });
-});
-
 router.get('/carrinho', function(req, res, next) {
   res.render('loja/carrinho', { title: 'Você está no Carrinho' });
 });
@@ -39,6 +34,16 @@ router.get('/login', function(req, res) {
   });
 });
 
+/* GET BANNERS */
+router.get('/', async function(req, res, next) {
+  try {
+    const [banners] = await db.query('SELECT * FROM banner ORDER BY ordem ASC');
+    res.render('loja/index', { title: 'RP Celulares - Home', banners });
+  } catch (err) {
+    next(err);
+  }
+});
+
 /* POST cadastro de cliente */
 router.post('/cadastro', async (req, res) => {
 
@@ -60,6 +65,16 @@ router.post('/cadastro', async (req, res) => {
       return res.render('loja/cadastro', {
         title: 'Você está no Cadastro',
         erro: 'Preencha todos os campos.'
+      });
+    }
+
+    // Validação do formato do telefone
+    const regexTelefone = /^\(\d{2}\) \d{5}-\d{4}$/;
+
+    if (!regexTelefone.test(telefone)) {
+      return res.render('loja/cadastro', {
+        title: 'Você está no Cadastro',
+        erro: 'Telefone inválido. Use o formato (00) 00000-0000.'
       });
     }
 
@@ -133,7 +148,6 @@ router.post('/cadastro', async (req, res) => {
   }
 });
 
-
 /* Rota de Login (funcionario e usuário) */
 router.post('/login', async (req, res) => {
 
@@ -167,6 +181,15 @@ router.post('/login', async (req, res) => {
     if (clientes.length > 0) {
 
       const cliente = clientes[0];
+
+      // Cliente cadastrado pelo funcionário ainda não definiu senha própria
+      if (!cliente.senha) {
+        return res.render('loja/login', {
+          title: 'Login',
+          erro: 'Você ainda não definiu uma senha. Use "Esqueci minha senha" para criar a sua.',
+          mensagem: null
+        });
+      }
 
       const senhaCorreta = await bcrypt.compare(
         senha,

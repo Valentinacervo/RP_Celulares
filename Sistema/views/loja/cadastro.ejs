@@ -46,17 +46,23 @@
       </div>
 
       <!-- Telefone + Email -->
-      <div class="row">
-        <div class="input-box">
+      <div class="input-box">
           <i class="bi bi-telephone-fill"></i>
-        <input type="text" name="telefone" placeholder="Telefone" required>
+          <input 
+              type="text" 
+              name="telefone" 
+              placeholder="(00) 00000-0000" 
+              maxlength="15"
+              pattern="\(\d{2}\) \d{5}-\d{4}"
+              title="Formato esperado: (00) 00000-0000"
+              required>
       </div>
 
       <div class="input-box">
           <i class="bi bi-envelope-fill"></i>
         <input type="email" name="email" placeholder="E-mail" required>
       </div>
-    </div>
+  
 
       <!-- Senhas -->
       <div class="row">
@@ -110,7 +116,7 @@
       <button type="submit" class="btn-login">PRÓXIMO</button>
 
       <!-- Login -->
-      <p class="login-link">
+      <p class="login-link" style="color: black;">
         Já possui uma conta? <a href="/login" style="color: black">Faça login</a>
       </p>
 
@@ -152,6 +158,23 @@
       alert("As senhas digitadas não coincidem. Por favor, verifique sua senha!");
     }
   });
+
+  // MÁSCARA DE TELEFONE (Para verificar se está dentro do parametro)
+const inputTelefone = document.querySelector('input[name="telefone"]');
+
+inputTelefone.addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '').slice(0, 11);
+
+    if (v.length > 6) {
+        v = v.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+    } else if (v.length > 2) {
+        v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+    } else if (v.length > 0) {
+        v = v.replace(/^(\d*)/, '($1');
+    }
+
+    this.value = v;
+});
 </script>
 </body>
 </html>

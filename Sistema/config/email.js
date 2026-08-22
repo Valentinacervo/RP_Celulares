@@ -13,8 +13,8 @@ async function sendEmail(to, subject, text, html) {
     from: `"RP Celulares" <${process.env.EMAIL_USER}>`,
     to: to,
     subject: subject,
-    text: text, // versão simples, para clientes de e-mail que não leem HTML
-    html: html  // versão bonita, é o que a maioria vai ver
+    text: text, 
+    html: html 
   });
 }
 

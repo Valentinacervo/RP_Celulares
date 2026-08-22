@@ -1,0 +1,36 @@
+<div id="modalBanner" class="modal-overlay">
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h2>Adicionar banner</h2>
+            <button type="button" class="modal-fechar" onclick="fecharModalBanner()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <form action="/admin/produtos/banners/adicionar" method="POST" enctype="multipart/form-data">
+
+            <div class="campo">
+                <label for="imagemBanner">Imagem do banner <span class="obrigatorio">*</span></label>
+                <input type="file" id="imagemBanner" name="imagem" accept="image/*" required>
+            </div>
+
+            <div class="modal-botoes">
+                <button type="button" class="btn-cancelar" onclick="fecharModalBanner()">Fechar</button>
+                <button type="submit" class="btn-salvar">Salvar</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+    function abrirModalBanner() {
+        document.getElementById("modalBanner").classList.add("ativo");
+    }
+
+    function fecharModalBanner() {
+        document.getElementById("modalBanner").classList.remove("ativo");
+    }
+</script>

@@ -1,0 +1,62 @@
+<div id="modalExcluirCategoria" class="modal-overlay">
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h2>Excluir categoria</h2>
+            <button type="button" class="modal-fechar" onclick="fecharModalExcluirCategoria()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <p>Tem certeza que deseja excluir a categoria <strong id="nomeCategoriaExcluir"></strong>? Isso apagara tambem todos os produtos relacionados a ela.</p>
+
+        <% if (typeof erroExcluirCategoria !== "undefined" && erroExcluirCategoria) { %>
+            <div class="mensagem mensagem--erro"><%= erroExcluirCategoria %></div>
+        <% } %>
+
+        <form id="formExcluirCategoria" action="" method="POST">
+            <div class="campo">
+                <label for="senhaExcluir">Senha do administrador <span class="obrigatorio">*</span></label>
+                <div class="campo-senha">
+                    <input type="password" id="senhaExcluir" name="senha" required>
+                    <button type="button" class="btn-olho" onclick="alternarSenha()">
+                        <i class="bi bi-eye-fill" id="iconeOlho"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-botoes">
+                <button type="button" class="btn-cancelar" onclick="fecharModalExcluirCategoria()">Fechar</button>
+                <button type="submit" class="btn-excluir">Excluir</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    function abrirModalExcluirCategoria(id, nome) {
+        document.getElementById("nomeCategoriaExcluir").textContent = nome;
+        document.getElementById("formExcluirCategoria").action = "/admin/produtos/categorias/" + id + "/excluir";
+        document.getElementById("modalExcluirCategoria").classList.add("ativo");
+    }
+
+    function fecharModalExcluirCategoria() {
+        document.getElementById("modalExcluirCategoria").classList.remove("ativo");
+    }
+
+    function alternarSenha() {
+        const campo = document.getElementById("senhaExcluir");
+        const icone = document.getElementById("iconeOlho");
+
+        if (campo.type === "password") {
+            campo.type = "text";
+            icone.classList.remove("bi-eye-fill");
+            icone.classList.add("bi-eye-slash-fill");
+        } else {
+            campo.type = "password";
+            icone.classList.remove("bi-eye-slash-fill");
+            icone.classList.add("bi-eye-fill");
+        }
+    }
+</script>
