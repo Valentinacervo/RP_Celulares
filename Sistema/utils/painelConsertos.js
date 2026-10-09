@@ -5,7 +5,7 @@ const DIAS_ENTREGA_PROXIMA = 3;
 const DIAS_AVISO_RECENTE = 7;
 
 
-const MAX_AVISOS = 4;
+const MAX_AVISOS = 3;
 
 // Na página de avisos o histórico é mais longo que no painel
 const DIAS_AVISO_DETALHADO = 30;
@@ -42,9 +42,11 @@ async function buscarResumoGrafico() {
 }
 
 // ---------- AVISOS IMPORTANTES ----------
+// ---------- AVISOS IMPORTANTES (painel da tela inicial) ----------
+// Mostra só as MAX_AVISOS atualizações mais recentes, da mais nova (topo) para a mais antiga
 async function buscarAvisos() {
   const [entregas] = await db.query(
-    `SELECT id_conserto, codigo,
+    `SELECT id_conserto AS id, codigo,
             DATE_FORMAT(data_prometida, '%d/%m/%Y') AS data,
             DATEDIFF(data_prometida, CURDATE()) AS dias
      FROM conserto
@@ -52,42 +54,51 @@ async function buscarAvisos() {
        AND data_prometida IS NOT NULL
        AND data_prometida <= DATE_ADD(CURDATE(), INTERVAL ? DAY)
      ORDER BY data_prometida ASC, id_conserto ASC
-     LIMIT 2`,
-    [DIAS_ENTREGA_PROXIMA]
+     LIMIT ?`,
+    [DIAS_ENTREGA_PROXIMA, MAX_AVISOS]
   );
 
   const [concluidos] = await db.query(
-    `SELECT id_conserto, codigo, DATE_FORMAT(data_conclusao, '%d/%m/%Y') AS data
+    `SELECT id_conserto AS id, codigo,
+            DATE_FORMAT(data_conclusao, '%d/%m/%Y') AS data,
+            UNIX_TIMESTAMP(data_conclusao) AS ordem
      FROM conserto
      WHERE status = 'concluido'
        AND data_conclusao IS NOT NULL
        AND data_conclusao >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
      ORDER BY data_conclusao DESC, id_conserto DESC
-     LIMIT 2`,
-    [DIAS_AVISO_RECENTE]
+     LIMIT ?`,
+    [DIAS_AVISO_RECENTE, MAX_AVISOS]
   );
 
   const [novos] = await db.query(
-    `SELECT id_conserto, codigo, tipo_aparelho, DATE_FORMAT(data_solicitada, '%d/%m/%Y') AS data
+    `SELECT id_conserto AS id, codigo, tipo_aparelho,
+            DATE_FORMAT(data_solicitada, '%d/%m/%Y') AS data,
+            UNIX_TIMESTAMP(data_solicitada) AS ordem
      FROM conserto
      WHERE data_solicitada >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
      ORDER BY data_solicitada DESC, id_conserto DESC
-     LIMIT 2`,
-    [DIAS_AVISO_RECENTE]
+     LIMIT ?`,
+    [DIAS_AVISO_RECENTE, MAX_AVISOS]
   );
 
   // estoque = 0 é esgotado; NULL (estoque nunca informado) não conta
   const [esgotados] = await db.query(
-    `SELECT id_produto, nome
+    `SELECT id_produto AS id, nome, UNIX_TIMESTAMP(CURDATE()) AS ordem
      FROM produto
      WHERE ativo = 1 AND estoque = 0
      ORDER BY id_produto DESC
-     LIMIT 2`
+     LIMIT ?`,
+    [MAX_AVISOS]
   );
 
-  const linkConserto = (conserto) => (conserto.codigo ? `/admin/consertos/${conserto.codigo}` : '/admin/todosconsertos');
+  // Entregas próximas e produtos esgotados são situações de hoje (não há data do evento
+  // no banco), então entram na ordenação com a data de hoje.
+  const [[{ hoje }]] = await db.query('SELECT UNIX_TIMESTAMP(CURDATE()) AS hoje');
+
   const codigo = (conserto) => (conserto.codigo ? `#${conserto.codigo}` : '(sem código)');
 
+  // prioridade: em empate de data, conserto concluído > novo > entrega > esgotado
   const listaEntregas = entregas.map(conserto => {
     const dias = Number(conserto.dias);
     let texto;
@@ -101,41 +112,40 @@ async function buscarAvisos() {
       texto = `Entrega próxima: conserto ${codigo(conserto)} - falta ${dias} ${plural(dias, 'dia', 'dias')} para o prazo (${conserto.data})`;
     }
 
-    return { tipo: 'entrega', icone: ICONES.entrega, alerta: dias <= 0, texto, link: linkConserto(conserto) };
+    return { tipo: 'entrega', icone: ICONES.entrega, alerta: dias <= 0, texto, ordem: Number(hoje), prioridade: 3, id: Number(conserto.id) };
   });
 
   const listaConcluidos = concluidos.map(conserto => ({
     tipo: 'concluido',
     icone: ICONES.conserto,
     texto: `Conserto ${codigo(conserto)} concluído e pronto para retirada - ${conserto.data}`,
-    link: linkConserto(conserto)
+    ordem: Number(conserto.ordem),
+    prioridade: 1,
+    id: Number(conserto.id)
   }));
 
   const listaNovos = novos.map(conserto => ({
     tipo: 'novo',
     icone: ICONES.conserto,
     texto: `Novo conserto registrado: conserto ${codigo(conserto)} ${conserto.tipo_aparelho || ''}`.trim() + ` - ${conserto.data}`,
-    link: linkConserto(conserto)
+    ordem: Number(conserto.ordem),
+    prioridade: 2,
+    id: Number(conserto.id)
   }));
 
   const listaEsgotados = esgotados.map(produto => ({
     tipo: 'esgotado',
     icone: ICONES.semEstoque,
     texto: `Produto esgotado: ${produto.nome}`,
-    link: '/admin/produtos'
+    ordem: Number(produto.ordem),
+    prioridade: 4,
+    id: Number(produto.id)
   }));
 
-  // Um aviso de cada tipo por vez (entrega, concluído, novo, esgotado), para variar o painel
-  const grupos = [listaEntregas, listaConcluidos, listaNovos, listaEsgotados];
-  const avisos = [];
-
-  for (let posicao = 0; posicao < 2; posicao++) {
-    grupos.forEach(grupo => {
-      if (grupo[posicao]) avisos.push(grupo[posicao]);
-    });
-  }
-
-  return avisos.slice(0, MAX_AVISOS);
+  // Mais recente primeiro; só os MAX_AVISOS primeiros aparecem no painel
+  return [...listaEntregas, ...listaConcluidos, ...listaNovos, ...listaEsgotados]
+    .sort((a, b) => b.ordem - a.ordem || a.prioridade - b.prioridade || b.id - a.id)
+    .slice(0, MAX_AVISOS);
 }
 
 // ---------- AVISOS IMPORTANTES (página detalhada) ----------

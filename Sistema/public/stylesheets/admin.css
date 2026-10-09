@@ -1046,7 +1046,6 @@ object-fit:cover;
 /* ------ ÁREA CONSERTOS: LISTAGENS ------ */
 .cliente-contato i {
     margin-right: 4px;
-    color: #3E7F57;
 }
 
 .sidebar-consertos li.active a {
@@ -1184,11 +1183,6 @@ object-fit:cover;
     font-size: 14px;
     line-height: 1.35;
     color: #222;
-    text-decoration: none;
-}
-
-.painel-aviso:hover {
-    background: rgba(0, 0, 0, 0.06);
 }
 
 .painel-aviso-icone {

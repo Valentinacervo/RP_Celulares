@@ -12,7 +12,7 @@
 
 <body>
     <!-- NAVBAR -->
-    <header class="navbar">
+    <header class="navbar navbar--sem-busca">
     <div class="logo">
         RP 
     </div>
@@ -22,11 +22,6 @@
         <a href="/admin/produtos">Produtos</a>
         <a href="/admin/clientes">Clientes</a>
     </nav>
-    
-    <div class="search-area">
-        <input type="text" id="txtBusca" placeholder="Procurar conserto">
-        <i class="bi bi-search search-icon"></i>
-    </div>
 
     <!-- Área do Admin com Dropdown-->
     <div class="user-menu-container">
@@ -164,10 +159,10 @@
                     <ul class="painel-avisos-lista">
                         <% avisos.forEach(aviso => { %>
                             <li>
-                                <a href="<%= aviso.link %>" class="painel-aviso <%= aviso.alerta ? 'painel-aviso--alerta' : '' %>">
+                                <div class="painel-aviso <%= aviso.alerta ? 'painel-aviso--alerta' : '' %>">
                                     <span class="painel-aviso-icone"><img src="<%= aviso.icone %>" alt=""></span>
                                     <span class="painel-aviso-texto"><%= aviso.texto %></span>
-                                </a>
+                                </div>
                             </li>
                         <% }) %>
                     </ul>
