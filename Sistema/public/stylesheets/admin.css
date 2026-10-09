@@ -282,6 +282,209 @@ object-fit:cover;
 }
 
 
+/* ------ ÁREA CONSERTOS: CADASTRO ------ */
+.form-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+.mensagem {
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+.mensagem--erro {
+    background: #fdecea;
+    border: 1px solid #c0392b;
+    color: #8e2b20;
+}
+
+.mensagem--sucesso {
+    background: #e6f4ea;
+    border: 1px solid #3E7F57;
+    color: #16301F;
+}
+
+/* Barra de busca de cliente */
+.busca-cliente {
+    margin: 0 auto 20px auto;
+    text-align: center;
+}
+
+.busca-cliente > label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.busca-cliente-campo {
+    position: relative;
+    max-width: 380px;
+    margin: 0 auto;
+}
+
+/* Em telas pequenas a frase pode quebrar em duas linhas */
+@media (max-width: 700px) {
+    .busca-cliente > label {
+        white-space: normal;
+    }
+}
+
+.busca-cliente-campo input {
+    width: 100%;
+    height: 34px;
+    padding: 0 38px 0 14px;
+    border: 1px solid #535353;
+    border-radius: 20px;
+    background: #fff;
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+.busca-cliente-campo > i {
+    position: absolute;
+    right: 14px;
+    top: 9px;
+    color: #333;
+    pointer-events: none;
+}
+
+.busca-cliente-resultados {
+    display: none;
+    position: absolute;
+    top: 38px;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    background: #fff;
+    border: 1px solid #535353;
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.busca-cliente-resultados li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 16px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.busca-cliente-resultados li:hover {
+    background: rgba(162, 207, 158, 0.3);
+}
+
+.busca-cliente-resultados li span {
+    font-size: 12px;
+    color: #666;
+}
+
+.busca-cliente-resultados li.busca-cliente-vazio {
+    color: #666;
+    cursor: default;
+}
+
+.busca-cliente-resultados li.busca-cliente-vazio:hover {
+    background: none;
+}
+
+/* Botão de limpar cliente selecionado */
+.btn-limpar-cliente {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 6px 14px;
+    background: none;
+    border: 1px solid #16301F;
+    border-radius: 20px;
+    color: #16301F;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-limpar-cliente:hover {
+    background: rgba(22, 48, 31, 0.1);
+}
+
+/* Aviso flutuante (toast) */
+.aviso-flutuante {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translate(-50%, -20px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: calc(100% - 40px);
+    max-width: 480px;
+    padding: 12px 16px;
+    color: #fcfffb;
+    background: #77ba83;
+    border-radius: 10px;
+    font-size: 13px;
+    box-sizing: border-box;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+}
+
+.aviso-flutuante.visivel {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+}
+
+.aviso-flutuante > i {
+    font-size: 20px;
+    color: #fcfffb;
+}
+
+.aviso-flutuante div {
+    flex: 1;
+}
+
+.aviso-flutuante strong {
+    display: block;
+    margin-bottom: 2px;
+}
+
+.aviso-flutuante span {
+    display: block;
+    font-size: 12px;
+    color: #fcfffb;
+}
+
+.aviso-flutuante button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.aviso-flutuante button:hover {
+    opacity: 1;
+}
+
+
 /* ------ AREA PRODUTOS ------ */
 .produtos-grid{
     display:grid;
@@ -722,13 +925,20 @@ object-fit:cover;
 
 /* ------ ÁREA CLIENTES ------ */
 .content {
-    margin-left: 0;
-    width: 100%;
-    max-width: 1300px;
-    margin-right: auto;
-    margin-left: auto;
+    margin-left: 235px;
+    margin-right: 0;
+    width: auto;
+    max-width: none;
     padding: 40px 30px;
     box-sizing: border-box;
+}
+
+/* Tela Clientes centralizada */
+.content.content-centralizado {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 1300px;
 }
 
 .titulo-pagina {
@@ -748,7 +958,7 @@ object-fit:cover;
     align-items: center;
     gap: 8px;
     padding: 10px 18px;
-    background-color: #1c3426;
+    background-color: #3e8d5a;
     color: white;
     text-decoration: none;
     border-radius: 6px;
@@ -758,7 +968,7 @@ object-fit:cover;
 }
 
 .btn-adicionar-cliente:hover {
-    background-color: #649e6b;
+    background-color: #2c5c32;
 }
 
 .clientes-lista{
@@ -830,4 +1040,561 @@ object-fit:cover;
 .cliente-servico{
     font-size:13px;
     color:#333;
+}
+
+
+/* ------ ÁREA CONSERTOS: LISTAGENS ------ */
+.cliente-contato i {
+    margin-right: 4px;
+    color: #3E7F57;
+}
+
+.sidebar-consertos li.active a {
+    background-color: rgba(162, 207, 158, 0.3);
+}
+
+.conserto-status {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+.conserto-status--pendente {
+    background: #fff1cc;
+    color: #8a5d00;
+}
+
+.conserto-status--concluido {
+    background: #d6efdc;
+    color: #1f6b3a;
+}
+
+/* Cards de conserto (altura) */
+.clientes-lista.conserto-lista {
+    gap: 10px;
+}
+
+.conserto-card {
+    padding: 10px 22px;
+}
+
+.conserto-card .cliente-topo {
+    margin-bottom: 4px;
+}
+
+.conserto-card .btn-ver-detalhes {
+    padding: 4px 12px;
+}
+
+.conserto-card .cliente-contato {
+    margin-bottom: 0;
+}
+
+.conserto-card .cliente-linha {
+    margin: 6px 0;
+}
+
+
+/* ------ ÁREA CONSERTOS: DESTACADOS ------ */
+.conserto-acoes {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-estrela {
+    background: none;
+    border: none;
+    padding: 4px;
+    font-size: 18px;
+    line-height: 1;
+    color: #8a8f80;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-estrela.ativa {
+    color: #7d7d7b;
+}
+
+.btn-estrela:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+/* ------ ÁREA CONSERTOS: PAINEL GERAL ------ */
+.painel-topo {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+    margin-top: 24px;
+}
+
+/* Avisos importantes */
+.painel-avisos {
+    background: #eeeeee;
+    border-radius: 12px;
+    padding: 20px 22px;
+}
+
+.painel-avisos-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.painel-avisos-topo h2 {
+    margin: 0;
+    font-size: 16px;
+    color: #222;
+}
+
+.painel-avisos-seta {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 18px;
+    color: #222;
+    text-decoration: none;
+}
+
+.painel-avisos-seta:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.painel-avisos-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.painel-aviso {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.35;
+    color: #222;
+    text-decoration: none;
+}
+
+.painel-aviso:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.painel-aviso-icone {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #488a4f;
+    color: #fff;
+    font-size: 20px;
+}
+
+.painel-aviso--alerta .painel-aviso-icone {
+    background: #b3402e;
+}
+
+.painel-vazio {
+    margin: 0;
+    padding: 10px 0;
+    font-size: 14px;
+    color: #efefef;
+}
+
+/* Gráfico */
+.painel-grafico {
+    text-align: center;
+}
+
+.painel-grafico h2 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: #222;
+}
+
+.grafico-legenda {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 0 0 8px;
+    padding: 0;
+    font-size: 11px;
+    color: #444;
+}
+
+.grafico-legenda li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.grafico-bolinha {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.grafico-svg {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    margin: 0 auto;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Bloco de notas */
+.painel-notas {
+    margin-top: 26px;
+    padding: 20px 24px;
+    background: #a2cf9e;
+    border-radius: 12px;
+    color: #16301F;
+}
+
+.painel-notas-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.painel-notas-topo h2 {
+    margin: 0;
+    font-size: 16px;
+    color: #181615;
+}
+
+.painel-notas-editar {
+    background: none;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 15px;
+    color: #16301F;
+    cursor: pointer;
+}
+
+.painel-notas-editar:hover {
+    background: rgba(22, 48, 31, 0.12);
+}
+
+.painel-notas-lista {
+    margin: 0;
+    padding-left: 22px;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.painel-notas-vazio {
+    margin: 0;
+    font-size: 14px;
+    color: #355a42;
+}
+
+.painel-notas-editor textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: #f4f7e9;
+    border: 1px solid #535353;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.painel-notas-erro {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: #8e2b20;
+}
+
+.painel-notas-botoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.painel-notas-cancelar,
+.painel-notas-salvar {
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.painel-notas-cancelar {
+    background: none;
+    border: 1px solid #16301F;
+    color: #16301F;
+}
+
+.painel-notas-cancelar:hover {
+    background: rgba(22, 48, 31, 0.12);
+}
+
+.painel-notas-salvar {
+    background: #16301F;
+    border: 1px solid #16301F;
+    color: #fff;
+}
+
+.painel-notas-salvar:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+@media (max-width: 900px) {
+    .painel-topo {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ------ ÁREA CONSERTOS: AVISOS IMPORTANTES (ícones do painel) ------ */
+.painel-aviso-icone,
+.painel-aviso--alerta .painel-aviso-icone {
+    background: transparent;
+}
+
+.painel-aviso-icone img {
+    width: 44px;
+    height: 44px;
+    display: block;
+}
+
+.navbar--sem-busca .user-menu-container {
+    margin-left: auto;
+}
+
+.nav-buttons a.ativo {
+    background: #357640;
+}
+
+.avisos-pagina {
+    font-family: 'Poppins', Arial, Helvetica, sans-serif;
+}
+
+.avisos-cabecalho {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 26px;
+}
+
+.avisos-titulo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.avisos-titulo h1 {
+    margin: 0;
+    font-family: 'Poppins', Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #222;
+}
+
+.avisos-titulo .painel-avisos-seta {
+    display: flex;
+    align-items: center;
+}
+
+/* Filtro */
+.avisos-filtro {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.avisos-filtro-botao {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    background: #fff;
+    color: #222;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.avisos-filtro-botao:hover {
+    background: #f5f5f5;
+}
+
+.avisos-filtro-seta {
+    font-size: 11px;
+}
+
+.avisos-filtro-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    min-width: 160px;
+    margin: 0;
+    padding: 4px 0;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.avisos-filtro.aberto .avisos-filtro-menu {
+    display: block;
+}
+
+.avisos-filtro-opcao {
+    display: block;
+    width: 100%;
+    padding: 9px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-family: inherit;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+}
+
+.avisos-filtro-opcao:hover {
+    background: #f4f7e9;
+}
+
+.avisos-filtro-opcao.ativo {
+    font-weight: 600;
+    color: #357640;
+}
+
+/* Tabela */
+.avisos-colunas,
+.aviso-linha {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.5fr) minmax(0, 0.5fr);
+    align-items: center;
+    column-gap: 16px;
+}
+
+.avisos-colunas {
+    padding: 0 20px 10px;
+    border-bottom: 1px solid #8f8e8e;
+    font-size: 15px;
+    color: #222;
+}
+
+.avisos-colunas span:nth-child(2),
+.avisos-colunas span:nth-child(3),
+.aviso-descricao,
+.aviso-data {
+    text-align: center;
+}
+
+.aviso-linha {
+    padding: 10px 20px;
+    min-height: 44px;
+    background: #fff;
+    font-size: 13px;
+    color: #111;
+}
+
+.aviso-linha--cinza {
+    background: #f5f5f5;
+}
+
+.aviso-tipo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+}
+
+.aviso-icone {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+}
+
+.aviso-descricao em {
+    font-style: italic;
+}
+
+.avisos-vazio {
+    margin: 0;
+    padding: 24px 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+}
+
+@media (max-width: 900px) {
+    .avisos-cabecalho {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .avisos-filtro {
+        position: static;
+        transform: none;
+        align-self: flex-end;
+    }
+
+    .avisos-colunas,
+    .aviso-linha {
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) minmax(0, 0.7fr);
+        column-gap: 8px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+/* Página de avisos sem menu lateral */
+.content.avisos-pagina {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    max-width: none;
+    padding: 40px 0;
+    box-sizing: border-box;
+}
+
+.avisos-pagina .avisos-cabecalho {
+    padding: 0 30px;
+}
+
+.avisos-pagina .avisos-tabela {
+    width: 100%;
+}
+
+.avisos-pagina .avisos-colunas,
+.avisos-pagina .aviso-linha {
+    padding-left: 40px;
+    padding-right: 40px;
 }

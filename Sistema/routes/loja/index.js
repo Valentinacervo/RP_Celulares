@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt'); // Algoritmo de criptografia
 const crypto = require('crypto'); // Gera tokens aleatórios
 const sendEmail = require('../../config/email'); // Manda email para usuário
 const { templateCodigoRecuperacao } = require('../../config/emailTemplates');
+const { gerarCodigoCliente } = require('../../utils/codigoCliente');
 
 router.get('/carrinho', function(req, res, next) {
   res.render('loja/carrinho', { title: 'Você está no Carrinho' });
@@ -122,14 +123,17 @@ router.post('/cadastro', async (req, res) => {
     // Hash senha
     const hashSenha = await bcrypt.hash(senha, 12);
 
+    // Gera o código aleatório do cliente (CLIXXX)
+    const codigo = await gerarCodigoCliente();
+
     // Salva no banco de dados
     const [resultado] = await db.query(
       `
       INSERT INTO cliente
-      (nome, telefone, email, senha, data_nasc)
-      VALUES (?, ?, ?, ?, ?)
+      (codigo, nome, telefone, email, senha, data_nasc)
+      VALUES (?, ?, ?, ?, ?, ?)
       `,
-      [nome.trim(), telefoneLimpo, emailLimpo, hashSenha, dataNascimento]
+      [codigo, nome.trim(), telefoneLimpo, emailLimpo, hashSenha, dataNascimento]
     );
 
     // Login automático 

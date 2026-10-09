@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar conserto - RP Celulares</title>
+    <link rel="stylesheet" href="/stylesheets/admin.css">
+    <!--ICONES-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+
+<body>
+    <% 
+    // Devolve o valor que o funcionário já tinha digitado (quando o formulário volta com erro)
+    const v = (campo, padrao = '') => (dados[campo] !== undefined ? dados[campo] : padrao);
+    %>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="logo">
+            RP
+        </div>
+
+        <nav class="nav-buttons">
+            <a href="/admin" class="active">Consertos</a>
+            <a href="/admin/produtos">Produtos</a>
+            <a href="/admin/clientes">Clientes</a>
+        </nav>
+
+        <div class="search-area">
+            <input type="text" id="txtBusca" placeholder="Procurar conserto">
+            <i class="bi bi-search search-icon"></i>
+        </div>
+
+        <!-- Área do Admin com Dropdown-->
+        <div class="user-menu-container">
+            <div class="user">
+                <img src="<%= usuario.foto || '/images/valentina.jpg' %>" class="user-photo" id="fotoPerfil" alt="Foto do usuário">
+                <span>Admin - Rodrigo </span>
+            </div>
+
+            <div class="user-dropdown">
+                <a href="#" id="btnMudarFoto">
+                    <i class="bi bi-camera-fill"></i> Mudar foto
+                </a>
+                <a href="/logout" class="btn-sair">
+                    <i class="bi bi-box-arrow-right"></i> Sair do sistema
+                </a>
+            </div>
+        </div>
+
+        <!-- FORMULÁRIO ESCONDIDO PARA UPLOAD -->
+        <form id="formFoto" action="/admin/upload-foto" method="POST" enctype="multipart/form-data" style="display: none;">
+            <input type="file" id="inputFoto" name="foto" accept="image/*">
+        </form>
+    </header>
+
+    <!-- MENU LATERAL -->
+    <aside class="sidebar sidebar-consertos">
+        <ul>
+            <li>
+                <a href="/admin">
+                    <i class="bi bi-house-fill"></i>
+                    <span>Início</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/destacados">
+                    <i class="bi bi-star-fill"></i>
+                    <span>Destacados</span>
+                </a>
+            </li>
+
+            <hr>
+
+            <li class="active">
+                <a href="/admin/adicionarconserto">
+                    <i class="bi bi-plus-circle-fill"></i>
+                    <span>Adicionar conserto</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/todosconsertos">
+                    <i class="bi bi-wrench"></i>
+                    <span>Todos os consertos</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/consertospendentes">
+                    <i class="bi bi-hourglass-split"></i>
+                    <span>Consertos pendentes</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/consertosconcluidos">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Consertos concluídos</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="content">
+        <h1>Cadastre um novo conserto <i class="bi bi-wrench"></i></h1>
+        <hr id="linhaPainel">
+
+        <% if (erro) { %>
+            <div class="mensagem mensagem--erro"><%= erro %></div>
+        <% } %>
+
+        <% if (sucesso) { %>
+            <div class="mensagem mensagem--sucesso"><%= sucesso %></div>
+        <% } %>
+
+        <!-- BUSCA DE CLIENTE JÁ CADASTRADO -->
+        <div class="busca-cliente">
+            <label for="buscaCliente">Cliente já cadastrado? Busque pelo nome para preencher os dados automaticamente.</label>
+
+            <div class="busca-cliente-campo">
+                <input type="text" id="buscaCliente" placeholder="Digite o nome do cliente" autocomplete="off">
+                <i class="bi bi-search"></i>
+                <ul id="buscaClienteResultados" class="busca-cliente-resultados"></ul>
+            </div>
+
+            <button type="button" id="btnLimparCliente" class="btn-limpar-cliente" style="display: none;">
+                <i class="bi bi-x-circle-fill"></i> Limpar dados do cliente
+            </button>
+        </div>
+
+        <div class="form-wrapper">
+            <form action="/admin/adicionarconserto" method="POST" id="formConserto">
+
+                <input type="hidden" name="id_cliente" id="id_cliente" value="<%= v('id_cliente') %>">
+                <input type="hidden" name="cliente_rotulo" id="cliente_rotulo" value="<%= v('cliente_rotulo') %>">
+
+                <!-- 1: DADOS DO CLIENTE -->
+                <div class="form-card">
+                    <h3>Dados do Cliente:</h3>
+
+                    <div class="campo">
+                        <label for="nome">Nome completo <span class="obrigatorio">*</span></label>
+                        <input type="text" id="nome" name="nome" maxlength="100" value="<%= v('nome') %>" required>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="campo">
+                            <label for="telefone">Telefone <span class="obrigatorio">*</span></label>
+                            <input type="text" id="telefone" name="telefone" placeholder="(00) 00000-0000" maxlength="15" value="<%= v('telefone') %>" required>
+                        </div>
+                        <div class="campo">
+                            <label for="email">E-mail <span class="obrigatorio">*</span></label>
+                            <input type="email" id="email" name="email" maxlength="100" value="<%= v('email') %>" required>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="contato_adicional">Contato adicional (opcional)</label>
+                        <input type="text" id="contato_adicional" name="contato_adicional" placeholder="(00) 00000-0000" maxlength="15" value="<%= v('contato_adicional') %>">
+                    </div>
+                </div>
+
+                <!-- 2: ENDEREÇO -->
+                <div class="form-card">
+                    <h3>Endereço:</h3>
+
+                    <div class="campo">
+                        <label for="rua">Rua / Avenida <span class="obrigatorio">*</span></label>
+                        <input type="text" id="rua" name="rua" maxlength="30" value="<%= v('rua') %>" required>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="campo">
+                            <label for="numero">Número <span class="obrigatorio">*</span></label>
+                            <input type="number" id="numero" name="numero" min="0" value="<%= v('numero') %>" required>
+                        </div>
+                        <div class="campo">
+                            <label for="complemento">Complemento <span class="obrigatorio">*</span></label>
+                            <input type="text" id="complemento" name="complemento" maxlength="50" placeholder="Apto, casa, ponto de referência..." value="<%= v('complemento') %>" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="campo">
+                            <label for="bairro">Bairro <span class="obrigatorio">*</span></label>
+                            <input type="text" id="bairro" name="bairro" maxlength="50" value="<%= v('bairro') %>" required>
+                        </div>
+                        <div class="campo">
+                            <label for="cep">CEP <span class="obrigatorio">*</span></label>
+                            <input type="text" id="cep" name="cep" maxlength="9" placeholder="00000-000" value="<%= v('cep') %>" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="campo">
+                            <label for="cidade">Cidade <span class="obrigatorio">*</span></label>
+                            <input type="text" id="cidade" name="cidade" maxlength="50" value="<%= v('cidade', 'Jacinto Machado') %>" required>
+                        </div>
+                        <div class="campo">
+                            <label for="id_uf">Estado <span class="obrigatorio">*</span></label>
+                            <select id="id_uf" name="id_uf" required>
+                                <option value="">Selecione</option>
+                                <% ufs.forEach(uf => { %>
+                                    <option value="<%= uf.id_uf %>" <%= String(v('id_uf')) === String(uf.id_uf) ? 'selected' : '' %>><%= uf.descricao %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3: DADOS DO CONSERTO -->
+                <div class="form-card">
+                    <h3>Dados do Conserto: <span class="obrigatorio">*</span></h3>
+
+                    <div class="form-grid-2">
+                        <div class="campo">
+                            <label for="data_abertura">Data de abertura <span class="obrigatorio">*</span></label>
+                            <input type="date" id="data_abertura" name="data_abertura" value="<%= v('data_abertura', hoje) %>" required>
+                        </div>
+                        <div class="campo">
+                            <label for="data_prevista">Data prevista de entrega <span class="obrigatorio">*</span></label>
+                            <input type="date" id="data_prevista" name="data_prevista" min="<%= v('data_abertura', hoje) %>" value="<%= v('data_prevista') %>" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-3">
+                        <div class="campo">
+                            <label for="tipo_aparelho">Tipo de aparelho <span class="obrigatorio">*</span></label>
+                            <select id="tipo_aparelho" name="tipo_aparelho" required>
+                                <option value="">Selecione</option>
+                                <% opcoes.tiposAparelho.forEach(tipo => { %>
+                                    <option value="<%= tipo %>" <%= v('tipo_aparelho') === tipo ? 'selected' : '' %>><%= tipo %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="marca">Marca <span class="obrigatorio">*</span></label>
+                            <select id="marca" name="marca" required>
+                                <option value="">Selecione</option>
+                                <% opcoes.marcas.forEach(marca => { %>
+                                    <option value="<%= marca %>" <%= v('marca') === marca ? 'selected' : '' %>><%= marca %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="modelo">Modelo <span class="obrigatorio">*</span></label>
+                            <input type="text" id="modelo" name="modelo" maxlength="100" placeholder="Ex.: iPhone 13" value="<%= v('modelo') %>" required>
+                        </div>
+                    </div>
+                    
+                    <div class="campo" id="campoTipoOutro" style="display: none;">
+                        <label for="tipo_aparelho_outro">Qual é o tipo de aparelho? <span class="obrigatorio">*</span></label>
+                        <input type="text" id="tipo_aparelho_outro" name="tipo_aparelho_outro" maxlength="30" value="<%= v('tipo_aparelho_outro') %>">
+                    </div>
+
+                    <div class="campo" id="campoMarcaOutra" style="display: none;">
+                        <label for="marca_outra">Qual é a marca? <span class="obrigatorio">*</span></label>
+                        <input type="text" id="marca_outra" name="marca_outra" maxlength="50" value="<%= v('marca_outra') %>">
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="campo">
+                            <label for="acessorios">Acessórios deixados</label>
+                            <input type="text" id="acessorios" name="acessorios" maxlength="200" placeholder="Ex.: carregador, capinha ou nenhum" value="<%= v('acessorios') %>">
+                        </div>
+                        <div class="campo">
+                            <label for="servico_solicitado">Serviço solicitado <span class="obrigatorio">*</span></label>
+                            <select id="servico_solicitado" name="servico_solicitado" required>
+                                <option value="">Selecione</option>
+                                <% opcoes.servicos.forEach(servico => { %>
+                                    <option value="<%= servico %>" <%= v('servico_solicitado') === servico ? 'selected' : '' %>><%= servico %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="campo" id="campoServicoOutro" style="display: none;">
+                        <label for="servico_solicitado_outro">Qual é o serviço solicitado? <span class="obrigatorio">*</span></label>
+                        <input type="text" id="servico_solicitado_outro" name="servico_solicitado_outro" maxlength="100" value="<%= v('servico_solicitado_outro') %>">
+                    </div>
+
+                    <div class="campo">
+                        <label for="descricao_problema">Descrição do problema <span class="obrigatorio">*</span></label>
+                        <textarea id="descricao_problema" name="descricao_problema" maxlength="500" rows="3" required><%= v('descricao_problema') %></textarea>
+                    </div>
+
+                    <div class="campo">
+                        <label for="observacoes_tecnicas">Observações técnicas</label>
+                        <textarea id="observacoes_tecnicas" name="observacoes_tecnicas" maxlength="500" rows="3"><%= v('observacoes_tecnicas') %></textarea>
+                    </div>
+
+                    <div class="form-grid-3">
+                        <div class="campo">
+                            <label for="valor">Valor estimado (R$)</label>
+                            <input type="number" id="valor" name="valor" step="0.01" min="0" placeholder="0,00" value="<%= v('valor') %>">
+                        </div>
+                        <div class="campo">
+                            <label for="forma_pagamento">Forma de pagamento</label>
+                            <select id="forma_pagamento" name="forma_pagamento">
+                                <option value="">Selecione</option>
+                                <% opcoes.formasPagamento.forEach(forma => { %>
+                                    <option value="<%= forma %>" <%= v('forma_pagamento') === forma ? 'selected' : '' %>><%= forma %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="garantia_dias">Garantia</label>
+                            <select id="garantia_dias" name="garantia_dias">
+                                <option value="">Selecione</option>
+                                <% opcoes.garantias.forEach(garantia => { %>
+                                    <option value="<%= garantia.valor %>" <%= String(v('garantia_dias')) === String(garantia.valor) ? 'selected' : '' %>><%= garantia.rotulo %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-botoes">
+                    <a href="/admin" class="btn-cancelar">Cancelar</a>
+                    <button type="submit" class="btn-salvar">
+                        <i class="bi bi-floppy2-fill"></i> Registrar Conserto
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+        <!-- AVISO FLUTUANTE (cliente carregado) -->
+    <div id="avisoFlutuante" class="aviso-flutuante" role="status">
+        <i class="bi bi-person-check-fill"></i>
+        <div>
+            <strong id="avisoTitulo"></strong>
+            <span>Alterações feitas nos dados abaixo serão salvas no cadastro do cliente.</span>
+        </div>
+        <button type="button" id="btnFecharAviso" aria-label="Fechar aviso">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+<script>
+    // ---------- FOTO DO ADMIN ----------
+    document.getElementById('btnMudarFoto').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('inputFoto').click();
+    });
+
+    document.getElementById('inputFoto').addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            document.getElementById('formFoto').submit();
+        }
+    });
+
+    // ---------- MÁSCARAS ----------
+    function formatarTelefone(valor) {
+        let v = String(valor || '').replace(/\D/g, '').slice(0, 11);
+        if (v.length > 6) {
+            v = v.replace(/^(\d{2})(\d{4,5})(\d{0,4}).*/, '($1) $2-$3');
+        } else if (v.length > 2) {
+            v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+        } else if (v.length > 0) {
+            v = v.replace(/^(\d*)/, '($1');
+        }
+        return v;
+    }
+
+    function formatarCep(valor) {
+        const v = String(valor || '').replace(/\D/g, '').slice(0, 8);
+        return v.length > 5 ? v.replace(/^(\d{5})(\d{0,3})/, '$1-$2') : v;
+    }
+
+    function aplicarMascara(input, funcao) {
+        input.addEventListener('input', function() {
+            this.value = funcao(this.value);
+        });
+    }
+
+    const campoTelefone = document.getElementById('telefone');
+    const campoContato = document.getElementById('contato_adicional');
+    const campoCep = document.getElementById('cep');
+
+    aplicarMascara(campoTelefone, formatarTelefone);
+    aplicarMascara(campoContato, formatarTelefone);
+    aplicarMascara(campoCep, formatarCep);
+
+    // ---------- CAMPO "OUTRO" ----------
+    function configurarCampoOutro(idSelect, valorOutro, idCampo, idInput) {
+        const select = document.getElementById(idSelect);
+        const campo = document.getElementById(idCampo);
+        const input = document.getElementById(idInput);
+
+        function atualizar() {
+            const outro = select.value === valorOutro;
+            campo.style.display = outro ? 'flex' : 'none';
+            input.required = outro;
+        }
+
+        select.addEventListener('change', atualizar);
+        atualizar();
+    }
+
+    configurarCampoOutro('tipo_aparelho', 'Outro', 'campoTipoOutro', 'tipo_aparelho_outro');
+    configurarCampoOutro('marca', 'Outra', 'campoMarcaOutra', 'marca_outra');
+    configurarCampoOutro('servico_solicitado', 'Outro', 'campoServicoOutro', 'servico_solicitado_outro');
+
+    // ---------- DATAS ----------
+    const dataAbertura = document.getElementById('data_abertura');
+    const dataPrevista = document.getElementById('data_prevista');
+
+    dataAbertura.addEventListener('change', function() {
+        dataPrevista.min = this.value;
+        if (dataPrevista.value && dataPrevista.value < this.value) {
+            dataPrevista.value = this.value;
+        }
+    });
+
+        // ---------- BUSCA DE CLIENTE ----------
+    const campoBusca = document.getElementById('buscaCliente');
+    const listaResultados = document.getElementById('buscaClienteResultados');
+    const btnLimpar = document.getElementById('btnLimparCliente');
+    const aviso = document.getElementById('avisoFlutuante');
+    const avisoTitulo = document.getElementById('avisoTitulo');
+    const campoIdCliente = document.getElementById('id_cliente');
+    const campoRotulo = document.getElementById('cliente_rotulo');
+
+    const camposCliente = [
+        'nome', 'telefone', 'email', 'contato_adicional',
+        'rua', 'numero', 'complemento', 'bairro', 'cep', 'cidade', 'id_uf'
+    ];
+
+    let temporizador = null;
+    let temporizadorAviso = null;
+    let ultimaBusca = 0;
+
+    function esconderResultados() {
+        listaResultados.style.display = 'none';
+        listaResultados.innerHTML = '';
+    }
+
+    function mostrarMensagem(texto) {
+        listaResultados.innerHTML = '';
+        const item = document.createElement('li');
+        item.className = 'busca-cliente-vazio';
+        item.textContent = texto;
+        listaResultados.appendChild(item);
+        listaResultados.style.display = 'block';
+    }
+
+    function mostrarSelecionado() {
+        btnLimpar.style.display = 'inline-flex';
+    }
+
+    function esconderAviso() {
+        clearTimeout(temporizadorAviso);
+        aviso.classList.remove('visivel');
+    }
+
+    function mostrarAviso(rotulo) {
+        avisoTitulo.textContent = 'Dados de ' + rotulo + ' carregados.';
+        aviso.classList.add('visivel');
+
+        clearTimeout(temporizadorAviso);
+        temporizadorAviso = setTimeout(esconderAviso, 6000);
+    }
+
+    function preencherCliente(cliente) {
+        document.getElementById('nome').value = cliente.nome || '';
+        document.getElementById('telefone').value = formatarTelefone(cliente.telefone);
+        document.getElementById('email').value = cliente.email || '';
+        document.getElementById('contato_adicional').value = formatarTelefone(cliente.contato_adicional);
+        document.getElementById('rua').value = cliente.rua || '';
+        document.getElementById('numero').value = cliente.numero != null ? cliente.numero : '';
+        document.getElementById('complemento').value = cliente.complemento || '';
+        document.getElementById('bairro').value = cliente.bairro || '';
+        document.getElementById('cep').value = formatarCep(cliente.cep);
+        document.getElementById('cidade').value = cliente.cidade || 'Jacinto Machado';
+        document.getElementById('id_uf').value = cliente.id_uf != null ? cliente.id_uf : '';
+
+        const rotulo = cliente.nome + (cliente.codigo ? ' (#' + cliente.codigo + ')' : '');
+        campoIdCliente.value = cliente.id_cliente;
+        campoRotulo.value = rotulo;
+        mostrarSelecionado();
+        mostrarAviso(rotulo);
+
+        campoBusca.value = '';
+        esconderResultados();
+    }
+
+    function limparCliente() {
+        camposCliente.forEach(function(id) {
+            document.getElementById(id).value = '';
+        });
+        document.getElementById('cidade').value = 'Jacinto Machado';
+
+        campoIdCliente.value = '';
+        campoRotulo.value = '';
+        btnLimpar.style.display = 'none';
+        esconderAviso();
+        campoBusca.value = '';
+        esconderResultados();
+    }
+
+    function mostrarResultados(clientes) {
+        listaResultados.innerHTML = '';
+
+        if (clientes.length === 0) {
+            mostrarMensagem('Nenhum cliente encontrado. Preencha os dados abaixo para cadastrá-lo.');
+            return;
+        }
+
+        clientes.forEach(function(cliente) {
+            const item = document.createElement('li');
+
+            const nome = document.createElement('strong');
+            nome.textContent = cliente.nome;
+
+            const detalhe = document.createElement('span');
+            detalhe.textContent = [
+                cliente.codigo ? '#' + cliente.codigo : '',
+                formatarTelefone(cliente.telefone)
+            ].filter(Boolean).join(' · ');
+
+            item.appendChild(nome);
+            item.appendChild(detalhe);
+            item.addEventListener('click', function() {
+                preencherCliente(cliente);
+            });
+
+            listaResultados.appendChild(item);
+        });
+
+        listaResultados.style.display = 'block';
+    }
+
+    async function buscarClientes(termo) {
+        const numeroBusca = ++ultimaBusca;
+
+        try {
+            const resposta = await fetch('/admin/adicionarconserto/buscar-clientes?q=' + encodeURIComponent(termo));
+            if (!resposta.ok) throw new Error('Erro na busca');
+            const clientes = await resposta.json();
+
+            // Ignora respostas antigas (o funcionário continuou digitando)
+            if (numeroBusca !== ultimaBusca) return;
+            mostrarResultados(clientes);
+        } catch (erro) {
+            if (numeroBusca !== ultimaBusca) return;
+            mostrarMensagem('Não foi possível buscar os clientes. Tente novamente.');
+        }
+    }
+
+    campoBusca.addEventListener('input', function() {
+        clearTimeout(temporizador);
+        const termo = this.value.trim();
+
+        if (termo.length < 2) {
+            ultimaBusca++;
+            esconderResultados();
+            return;
+        }
+
+        temporizador = setTimeout(function() {
+            buscarClientes(termo);
+        }, 250);
+    });
+
+    // Fecha a lista ao clicar fora dela
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.busca-cliente-campo')) {
+            esconderResultados();
+        }
+    });
+
+    btnLimpar.addEventListener('click', limparCliente);
+    document.getElementById('btnFecharAviso').addEventListener('click', esconderAviso);
+
+    // Se o formulário voltou com erro e um cliente estava selecionado, mantém o botão de limpar
+    if (campoIdCliente.value) {
+        mostrarSelecionado();
+    }
+</script>
+</body>
+
+</html>

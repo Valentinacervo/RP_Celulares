@@ -46,7 +46,7 @@
 </header>
 
 
-<main class="content">
+<main class="content content-centralizado">
     <div class="titulo-pagina">
         <h1>Gestão de Clientes</h1>
 
@@ -63,14 +63,13 @@
     <% } else { %>
         <div class="clientes-lista">
             <% clientes.forEach(cliente => { %>
-                <% const codigo = 'CLI' + String(cliente.id_cliente).padStart(3, '0'); %>
 
                 <div class="cliente-card">
 
                     <div class="cliente-topo">
                         <div class="cliente-nome-codigo">
                             <strong><%= cliente.nome %></strong>
-                            <span class="cliente-codigo">#<%= codigo %></span>
+                            <span class="cliente-codigo">#<%= cliente.codigo %></span>
                         </div>
 
                         <a href="/admin/clientes/<%= cliente.id_cliente %>" class="btn-ver-detalhes">
@@ -100,14 +99,19 @@
                     <% if (cliente.rua) { %>
                         <div class="cliente-endereco">
                             <i class="bi bi-geo-alt-fill"></i>
-                            <%= cliente.rua %>, <%= cliente.numero %> – <%= cliente.bairro %>, <%= cliente.cidade %><% if (cliente.uf) { %>/<%= cliente.uf %><% } %>
+                            <%= cliente.rua %>, <%= cliente.numero %> - <%= cliente.cidade %>, <%= cliente.uf %>
                         </div>
                     <% } %>
 
                     <hr class="cliente-linha">
 
                     <div class="cliente-servico">
-                        Último serviço: Nenhum serviço registrado
+                        <% if (cliente.ultimo_servico) { %>
+                            Último serviço: <%= cliente.ultimo_servico.descricao %>
+                            (<%= cliente.ultimo_servico.tipo %>) - <%= cliente.ultimo_servico.data %>
+                        <% } else { %>
+                            Último serviço: Nenhum serviço registrado
+                        <% } %>
                     </div>
 
                 </div>

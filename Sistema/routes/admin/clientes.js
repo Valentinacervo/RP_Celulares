@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../../db');
+const { gerarCodigoCliente } = require('../../utils/codigoCliente');
+const { anexarUltimoServico } = require('../../utils/ultimoServico');
 
 function verificarAutenticacao(req, res, next) {
   if (req.session.usuarioLogado) {
@@ -32,7 +34,7 @@ router.get('/', async (req, res, next) => {
       query += `
         WHERE cliente.nome LIKE ?
         OR REPLACE(REPLACE(REPLACE(cliente.telefone, '(', ''), ')', ''), '-', '') LIKE ?
-        OR CONCAT('CLI', LPAD(cliente.id_cliente, 3, '0')) LIKE ?
+        OR cliente.codigo LIKE ?
       `;
       const buscaTelefone = busca.replace(/\D/g, '');
       params.push(`%${busca}%`, `%${buscaTelefone}%`, `%${busca}%`);
@@ -41,6 +43,9 @@ router.get('/', async (req, res, next) => {
     query += ' ORDER BY cliente.id_cliente DESC';
 
     const [clientes] = await db.query(query, params);
+
+    // Anexa o último serviço (conserto ou compra) de cada cliente
+    await anexarUltimoServico(clientes);
 
     res.render('admin/clientes/clientesAdmin', {
       title: 'Clientes',
@@ -76,7 +81,8 @@ router.get('/adicionar', async (req, res, next) => {
 /* POST salvar novo cliente */
 router.post('/adicionar', async (req, res, next) => {
   try {
-    const { nome, cpf, data_nasc, telefone, email, contato_adicional } = req.body;
+   const {
+  nome, cpf, data_nasc, telefone, email, contato_adicional, rua, numero, complemento, bairro, cep, cidade, id_uf } = req.body;
 
     const [ufs] = await db.query(
       'SELECT id_uf, descricao FROM uf ORDER BY descricao'
@@ -105,10 +111,18 @@ router.post('/adicionar', async (req, res, next) => {
       });
     }
 
+    const [resultadoEndereco] = await db.query(
+      `INSERT INTO endereco (rua, numero, complemento, bairro, cep, cidade, id_uf)
+      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [rua, numero, complemento, bairro, cep, cidade, id_uf]
+    );
+
+    const codigo = await gerarCodigoCliente();
+
     await db.query(
-      `INSERT INTO cliente (nome, cpf, data_nasc, telefone, email, contato_adicional)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [nome, cpf, data_nasc, telefone, email, contato_adicional || null]
+      `INSERT INTO cliente (codigo, nome, cpf, data_nasc, telefone, email, contato_adicional, id_endereco)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [codigo, nome, cpf, data_nasc, telefone, email, contato_adicional || null, resultadoEndereco.insertId]
     );
 
     res.redirect('/admin/clientes');

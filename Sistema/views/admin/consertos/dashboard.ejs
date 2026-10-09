@@ -63,7 +63,7 @@
 
 
         <li>
-            <a href="/destacados">
+            <a href="/admin/destacados">
                 <i class="bi bi-star-fill"></i>
                 <span>Destacados</span>
             </a>
@@ -73,7 +73,7 @@
 
 
         <li>
-            <a href="/adicionarconserto">
+            <a href="/admin/adicionarconserto">
                 <i class="bi bi-plus-circle-fill"></i>
                 <span>Adicionar conserto</span>
             </a>
@@ -81,7 +81,7 @@
 
 
         <li>
-            <a href="/todosconsertos">
+            <a href="/admin/todosconsertos">
                 <i class="bi bi-wrench"></i>
                 <span>Todos os consertos</span>
             </a>
@@ -89,7 +89,7 @@
 
 
         <li>
-            <a href="/consertospendentes">
+            <a href="/admin/consertospendentes">
                 <i class="bi bi-hourglass-split"></i>
                 <span>Consertos pendentes</span>
             </a>
@@ -97,7 +97,7 @@
 
 
         <li>
-            <a href="/consertosconcluidos">
+            <a href="/admin/consertosconcluidos">
 
                 <i class="bi bi-check-circle-fill"></i>
 
@@ -112,6 +112,133 @@
     <main class="content">
         <h1>Painel Geral de Consertos</h1>
         <hr id="linhaPainel">
+
+        <%
+        // ----- Dados do gráfico -----
+        const barras = [
+            { rotulo: 'Concluídos', valor: resumo.concluidos, cor: '#937762' },
+            { rotulo: 'Pendentes',  valor: resumo.pendentes,  cor: '#357640' },
+            { rotulo: 'Urgentes',   valor: resumo.urgentes,   cor: '#234228' }
+        ];
+
+        const maior = Math.max(...barras.map(b => b.valor), 1);
+        const passo = [1, 2, 4, 5, 10, 20, 25, 50, 100, 200, 500, 1000].find(p => Math.ceil(maior / p) <= 6) || 1000;
+        const topo = Math.ceil(maior / passo) * passo;
+        const marcas = [];
+        for (let m = 0; m <= topo; m += passo) marcas.push(m);
+
+        // ----- Medidas do desenho (SVG) -----
+        const larg = 340, alt = 250;
+        const esq = 34, dir = 8, cima = 10, baixo = 30;
+        const areaL = larg - esq - dir;
+        const areaA = alt - cima - baixo;
+        const grupoL = areaL / barras.length;
+        const barraL = grupoL - 12;
+        const yDe = (valor) => cima + areaA - (valor / topo) * areaA;
+
+        // Barra com os cantos de cima arredondados
+        const caminhoBarra = (x, y, w, h) => {
+            const raio = Math.min(6, h / 2, w / 2);
+            const n = (valor) => valor.toFixed(2);
+            return `M${n(x)},${n(y + h)} L${n(x)},${n(y + raio)} Q${n(x)},${n(y)} ${n(x + raio)},${n(y)} L${n(x + w - raio)},${n(y)} Q${n(x + w)},${n(y)} ${n(x + w)},${n(y + raio)} L${n(x + w)},${n(y + h)} Z`;
+        };
+
+        // ----- Bloco de notas -----
+        const linhasNotas = notas.split('\n').map(l => l.trim()).filter(Boolean);
+        %>
+
+        <div class="painel-topo">
+
+            <!-- AVISOS IMPORTANTES -->
+            <section class="painel-avisos">
+                <div class="painel-avisos-topo">
+                    <h2>Avisos Importantes</h2>
+                    <a href="/admin/avisosImportantes" class="painel-avisos-seta" title="Ver todos os avisos" aria-label="Ver todos os avisos">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+
+                <% if (avisos.length === 0) { %>
+                    <p class="painel-vazio">Nenhum aviso no momento.</p>
+                <% } else { %>
+                    <ul class="painel-avisos-lista">
+                        <% avisos.forEach(aviso => { %>
+                            <li>
+                                <a href="<%= aviso.link %>" class="painel-aviso <%= aviso.alerta ? 'painel-aviso--alerta' : '' %>">
+                                    <span class="painel-aviso-icone"><img src="<%= aviso.icone %>" alt=""></span>
+                                    <span class="painel-aviso-texto"><%= aviso.texto %></span>
+                                </a>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } %>
+            </section>
+
+            <!-- RELATÓRIO DE CONSERTOS -->
+            <section class="painel-grafico">
+                <h2>Relatório de Consertos</h2>
+
+                <ul class="grafico-legenda">
+                    <% barras.forEach(barra => { %>
+                        <li>
+                            <span class="grafico-bolinha" style="background: <%= barra.cor %>;"></span>
+                            <%= barra.rotulo %>
+                        </li>
+                    <% }) %>
+                </ul>
+
+                <svg class="grafico-svg" viewBox="0 0 <%= larg %> <%= alt %>" role="img"
+                     aria-label="Gráfico de barras: <%= barras.map(b => b.rotulo + ' ' + b.valor).join(', ') %>">
+
+                    <% marcas.forEach(marca => { %>
+                        <line x1="<%= esq %>" x2="<%= larg - dir %>" y1="<%= yDe(marca).toFixed(2) %>" y2="<%= yDe(marca).toFixed(2) %>" stroke="#e3e3e3" stroke-width="1" />
+                        <text x="<%= esq - 8 %>" y="<%= (yDe(marca) + 3.5).toFixed(2) %>" text-anchor="end" font-size="10" fill="#555"><%= marca %></text>
+                    <% }) %>
+
+                    <% barras.forEach((barra, i) => {
+                        const x = esq + i * grupoL + 6;
+                        const h = (barra.valor / topo) * areaA;
+                        const y = cima + areaA - h;
+                    %>
+                        <% if (barra.valor > 0) { %>
+                            <path d="<%= caminhoBarra(x, y, barraL, h) %>" fill="<%= barra.cor %>">
+                                <title><%= barra.rotulo %>: <%= barra.valor %></title>
+                            </path>
+                        <% } %>
+                        <text x="<%= (x + barraL / 2).toFixed(2) %>" y="<%= alt - 10 %>" text-anchor="middle" font-size="11" fill="#333"><%= barra.valor %></text>
+                    <% }) %>
+                </svg>
+            </section>
+        </div>
+
+        <!-- BLOCO DE NOTAS -->
+        <section class="painel-notas">
+            <div class="painel-notas-topo">
+                <h2>Bloco de Notas</h2>
+                <button type="button" id="btnEditarNotas" class="painel-notas-editar" title="Editar anotações" aria-label="Editar anotações">
+                    <i class="bi bi-pencil-fill"></i>
+                </button>
+            </div>
+
+            <ul id="listaNotas" class="painel-notas-lista">
+                <% linhasNotas.forEach(linha => { %>
+                    <li><%= linha %></li>
+                <% }) %>
+            </ul>
+
+            <p id="notasVazio" class="painel-notas-vazio" style="display: <%= linhasNotas.length ? 'none' : 'block' %>;">
+                Nenhuma anotação ainda. Clique no lápis para escrever.
+            </p>
+
+            <div id="editorNotas" class="painel-notas-editor" style="display: none;">
+                <textarea id="textoNotas" maxlength="2000" rows="5" placeholder="Escreva uma anotação por linha"><%= notas %></textarea>
+                <p id="erroNotas" class="painel-notas-erro"></p>
+                <div class="painel-notas-botoes">
+                    <button type="button" id="btnCancelarNotas" class="painel-notas-cancelar">Cancelar</button>
+                    <button type="button" id="btnSalvarNotas" class="painel-notas-salvar">Salvar</button>
+                </div>
+            </div>
+        </section>
     </main>
 
     
@@ -126,6 +253,84 @@
     document.getElementById('inputFoto').addEventListener('change', function() {
         if (this.files && this.files[0]) {
             document.getElementById('formFoto').submit();
+        }
+    });
+
+        // ---------- BLOCO DE NOTAS ----------
+    let textoAtual = <%- JSON.stringify(notas).replace(/</g, '\\u003c') %>;
+
+    const listaNotas = document.getElementById('listaNotas');
+    const notasVazio = document.getElementById('notasVazio');
+    const editorNotas = document.getElementById('editorNotas');
+    const textoNotas = document.getElementById('textoNotas');
+    const erroNotas = document.getElementById('erroNotas');
+    const btnEditarNotas = document.getElementById('btnEditarNotas');
+    const btnSalvarNotas = document.getElementById('btnSalvarNotas');
+
+    function desenharNotas(texto) {
+        listaNotas.innerHTML = '';
+
+        const linhas = texto.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+
+        linhas.forEach(function(linha) {
+            const item = document.createElement('li');
+            item.textContent = linha;
+            listaNotas.appendChild(item);
+        });
+
+        notasVazio.style.display = linhas.length ? 'none' : 'block';
+    }
+
+    function abrirEditor() {
+        textoNotas.value = textoAtual;
+        erroNotas.textContent = '';
+        editorNotas.style.display = 'block';
+        listaNotas.style.display = 'none';
+        notasVazio.style.display = 'none';
+        btnEditarNotas.style.display = 'none';
+        textoNotas.focus();
+    }
+
+    function fecharEditor() {
+        editorNotas.style.display = 'none';
+        listaNotas.style.display = '';
+        btnEditarNotas.style.display = '';
+        desenharNotas(textoAtual);
+    }
+
+    btnEditarNotas.addEventListener('click', abrirEditor);
+    document.getElementById('btnCancelarNotas').addEventListener('click', fecharEditor);
+
+    btnSalvarNotas.addEventListener('click', async function() {
+        btnSalvarNotas.disabled = true;
+        erroNotas.textContent = '';
+
+        try {
+            const resposta = await fetch('/admin/bloco-notas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ texto: textoNotas.value })
+            });
+
+            // Sessão expirada: o servidor redireciona para a tela de login
+            if (resposta.redirected) {
+                erroNotas.textContent = 'Sua sessão expirou. Entre novamente para salvar.';
+                return;
+            }
+
+            const dados = await resposta.json();
+
+            if (!resposta.ok) {
+                erroNotas.textContent = dados.erro || 'Não foi possível salvar as anotações.';
+                return;
+            }
+
+            textoAtual = dados.texto;
+            fecharEditor();
+        } catch (erro) {
+            erroNotas.textContent = 'Não foi possível salvar as anotações. Tente novamente.';
+        } finally {
+            btnSalvarNotas.disabled = false;
         }
     });
 </script>
