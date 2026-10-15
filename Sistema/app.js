@@ -1,25 +1,21 @@
-require('dotenv').config(); 
+require('dotenv').config();
 
-const session = require('express-session'); // validação de login para acessar sistema interno da loja
+const session = require('express-session');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const db = require('./db');
 
+// --- ROTAS PÚBLICAS (home/conserto e sobre) ---
+var publicoRouter = require('./routes/publico');
 
-// --- ROTAS DA LOJA ONLINE ---
-var lojaIndexRouter = require('./routes/loja/index');
-var lojaConsertoRouter = require('./routes/loja/conserto');
-var lojaSobreRouter = require('./routes/loja/sobre');
-var lojaPerfilRouter = require('./routes/loja/perfil');
+// --- LOGIN / LOGOUT DO ADMIN ---
+var authRouter = require('./routes/auth');
 
 // --- ROTAS DO SISTEMA INTERNO (ADMIN) ---
 var adminDashboardRouter = require('./routes/admin/dashboard');
 var adminClientesRouter = require('./routes/admin/clientes');
-var adminProdutosRouter = require('./routes/admin/produtos');
-
 
 var app = express();
 
@@ -29,12 +25,12 @@ app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
-  secret: process.env.SESSION_SECRET, // (Não esquecer: lê do .env)
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -44,27 +40,10 @@ app.use(session({
   }
 }));
 
-// --- CATEGORIAS DISPONÍVEIS (menu lateral dinâmico) ---
-app.use(async (req, res, next) => {
-  try {
-    const [categorias] = await db.query('SELECT * FROM categoria ORDER BY nome');
-    res.locals.categoriasMenu = categorias;
-    next();
-  } catch (err) {
-    res.locals.categoriasMenu = [];
-    next();
-  }
-});
-
-// --- CONFIGURAÇÃO DAS URLs DA LOJA ---
-app.use('/', lojaIndexRouter);
-app.use('/conserto', lojaConsertoRouter);
-app.use('/sobre', lojaSobreRouter);
-app.use('/perfil', lojaPerfilRouter);
-
-// --- CONFIGURAÇÃO DAS URLs DO ADMIN ---
+// --- URLs ---
+app.use('/', publicoRouter);
+app.use('/', authRouter);
 app.use('/admin', adminDashboardRouter);
-app.use('/admin/produtos', adminProdutosRouter);
 app.use('/admin/clientes', adminClientesRouter);
 
 // catch 404 and forward to error handler
@@ -74,11 +53,9 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });

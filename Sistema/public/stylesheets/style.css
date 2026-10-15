@@ -30,7 +30,7 @@ body {
   color: white;
 }
 
-/* ------- NAVBAR 1 - Loja ------- */
+/* ------- NAVBAR 1 - INDEX/SOBRE NÓS ------- */
 
 .navbar-custom {
   height: 55px;
@@ -129,80 +129,7 @@ body {
   font-size: 22px;
 }
 
-
-/* ------- MENU LATERAL ------- */
-
-.offcanvas {
-  width: 220px !important;
-}
-
-.menu-header {
-  background: #a2cf9e;
-  color: white;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.menu-header i {
-  font-size: 22px;
-}
-
-.menu-titulo {
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.menu-lista {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.menu-item-link {
-    text-decoration: none;
-    color: inherit;      
-    display: block;     
-}
-
-.menu-lista li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  cursor: pointer;
-  font-size: 12px;
-  transition: 0.2s;
-}
-
-.menu-lista li:hover {
-  color: #357640;
-  padding-left: 8px;
-}
-
-.menu-lista li i {
-  font-size: 11px;
-  color: #666;
-}
-
-.offcanvas hr {
-  margin: 20px 0;
-}
-
 /* ------- NAVBAR 2 - LOGIN/CADASTRO ------- */
-
-.navbar-loginCadastro {
-  height: 55px;
-  background: linear-gradient(90deg, #1e3d2f, #6aa874);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-}
 
 .navbar-loginCadastro .logo {
   color: white;
@@ -227,9 +154,6 @@ body {
   height: calc(100vh - 55px);
 }
 
-.login-cadastro{
-  margin-right: 20px;
-}
 
 /* LADO ESQUERDO */
 .left-side {
@@ -289,6 +213,50 @@ body {
 
 }
 
+/* Formulário do login */
+.right-side form {
+  width: 280px;
+}
+
+.input-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  background: white;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+}
+
+.input-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  margin-left: 8px;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+}
+
+.senha-box i:last-child {
+  cursor: pointer;
+}
+
+.btn-login {
+  width: 100%;
+  background: #3e7f57;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 5px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+}
+
 /* Inputs */
 .input-box {
   display: flex;
@@ -338,166 +306,9 @@ body {
   font-size: 15px;
 }
 
-/* Texto */
-.register {
-  width: 280px;
-  margin-top: 10px;
-  font-size: 12px;
-  text-align: center;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  font-family: 'Poppins', sans-serif;
-}
-
-.social-text {
-  margin-top: 20px;
-  font-size: 12px;
-  text-align: center;
-  font-family: 'Poppins', sans-serif;
-}
-
-/* Redes - icones */
-.social-icons {
-  display: flex;
-  gap: 20px;
-  margin-top: -15px;
-  font-size: 28px;
-  justify-content: center;
-}
-
-.bi-facebook {
-  color: #1877f2;
-}
-
-.bi-google {
-  width: 32px;
-  height: 32px;
- margin-bottom: 3px;
-}
 
 
-
-/* ------- CADASTRO ------- */
-.cadastro-container {
-  text-align: center;
-  font-family: 'Poppins', sans-serif;
-  margin-top: 20px;
-}
-
-.cadastro-container h2 {
-  font-size: 22px; 
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-/* Caixa principal */
-.cadastro-box {
-  background: #a2cf9e;
-  padding: 25px;
-  width: 70%;
-  max-width: 600px;
-  margin: 0 auto;
-  border-radius: 10px;
-  font-size: 15px;
-}
-
-/* Título */
-.cadastro-box h3 {
-  margin-bottom: 15px;
-  font-weight: bold;
-  font-size: 20px;
-}
-
-/* Linhas */
-.row {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 10px;
-  width: 100%;
-}
-
-/* Input */
-.input-box {
-  display: flex;
-  align-items: center;
-  background: white;
-  border-radius: 8px;
-  padding: 6px 10px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.row .input-box {
-  flex: 1; 
-  margin-left: 12px;
-  margin-right: -12px;
-}
-
-/* Input (NOME) */
-.input-box.full {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-/* INPUT TEXTO */
-.input-box input {
-  border: none;
-  outline: none;
-  background: transparent;
-  margin-left: 8px;
-  width: 100%;
-  font-family: 'Poppins', sans-serif;
-}
-
-.senha-box i:last-child {
-  cursor: pointer;
-}
-
-/* Data */
-.data-label {
-  text-align: left;
-  margin-top: 10px;
-  margin-bottom: 5px;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-/* Container da data */
-.data-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-/* Select */
-.data-row select {
-  flex: 1;
-  padding: 6px;
-  border-radius: 6px;
-  border: none;
-  font-family: 'Poppins', sans-serif;
-}
-
-.btn-login {
-  width: 100%;
-  background: #3e7f57;
-  color: white;
-  border: none;
-  padding: 8px;
-  border-radius: 6px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-.login-link {
-  margin-top: 5px;
-  font-size: 13px;
-}
-
-
-/* ------- NAVBAR 3 - SOBRE NÓS ------- */
+/* ------- SOBRE NÓS ------- */
 .navbar-sobreNos {
   height: 55px;
   background: linear-gradient(90deg, #1e3d2f, #6aa874);
@@ -545,7 +356,7 @@ body {
   text-decoration: none;
 }
 
-/* ------- SOBRE NÓS - TELA ------- */
+
 .sobre-hero {
   display: flex;
   justify-content: space-between;
@@ -561,7 +372,7 @@ body {
   font-size: 25px;
   font-weight: 400;
   color: #111;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   font-weight: bolder;
 }
 
@@ -569,31 +380,14 @@ body {
   font-size: 14px;
   line-height: 1.3;
   color: #111;
-  margin-bottom: 25px;
+  margin-top: 15px;
+  margin-bottom: 15px;
   max-width: 280px;
   font-family: 'Poppins', sans-serif;
 }
 
-.btn-saibaMais {
-  background: #71b95a;
-  color: white;
-  text-decoration: none;
-  padding: 8px 35px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: 'Poppins', sans-serif;
-  transition: background-color 0.3s ease,
-              color 0.3s ease;
-}
-
-.btn-saibaMais:hover {
-  background-color: #437433;
-  color: white;
-}
-
 .hero-image img {
-  width: 300px;
+  width: 270px;
 }
 
 /* Linha */
@@ -640,159 +434,6 @@ body {
   font-family: 'Poppins', sans-serif;
   text-align: left;
 }
-
-
-/* ------- RECUPERAR SENHA ------- */
-
-:root{
-    --rp-verde-escuro: #16301F;
-    --rp-verde-brand: #3E7F57;
-    --rp-preto: #14150F;
-    --rp-branco: #FFFFFF;
-    --rp-cinza-texto: #6B6F68;
-    --rp-borda: #DBDBDB;
-}
-
-.recuperar-container{
-    min-height: calc(100vh - 55px);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background: var(--rp-branco);
-    font-family:'Poppins',sans-serif;
-    padding:20px;
-}
-
-.recuperar-card{
-    width:100%;
-    max-width:350px;
-    background: var(--rp-branco);
-    border:1px solid var(--rp-borda);
-    border-radius:4px;
-    padding:40px 32px 24px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    text-align:center;
-}
-
-/* ÍCONE CIRCULAR */
-.recuperar-icone{
-    width:60px;
-    height:60px;
-    border:1.5px solid var(--rp-preto);
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color: var(--rp-preto);
-    margin-bottom:20px;
-}
-
-.recuperar-icone svg{
-    width:24px;
-    height:24px;
-}
-
-.recuperar-card h2{
-    font-size:16px;
-    font-weight:600;
-    color: var(--rp-preto);
-    margin-bottom:10px;
-}
-
-.recuperar-card p{
-    font-size:13px;
-    color: var(--rp-cinza-texto);
-    line-height:1.5;
-    margin-bottom:20px;
-}
-
-.recuperar-card form{
-    width:100%;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
-.recuperar-card input,
-.recuperar-card button{
-    box-sizing: border-box;
-}
-
-.recuperar-card input{
-    height:38px;
-    width:100%;
-    border:1px solid var(--rp-borda);
-    border-radius:4px;
-    padding:0 10px;
-    font-size:13px;
-    outline:none;
-    text-align:center;
-    background:#FAFAFA;
-    color: var(--rp-preto);
-}
-
-.recuperar-card input::placeholder{
-    color:#8e8e8e;
-}
-
-.recuperar-card input:focus{
-    border-color: var(--rp-verde-brand);
-    background: var(--rp-branco);
-}
-
-.recuperar-card button{
-    height:38px;
-    border:none;
-    border-radius:4px;
-    background: var(--rp-verde-brand);
-    color: var(--rp-branco);
-    font-size:14px;
-    font-weight:600;
-    cursor:pointer;
-    transition: background .15s ease;
-}
-
-.recuperar-card button:hover{
-    background: var(--rp-verde-escuro);
-}
-
-.voltar-login{
-    display:block;
-    margin-top:22px;
-    padding-top:16px;
-    width:100%;
-    border-top:1px solid var(--rp-borda);
-    font-size:13px;
-    color: var(--rp-preto);
-    text-decoration:none;
-}
-
-.voltar-login:hover{
-    text-decoration:underline;
-}
-
-/* MENSAGENS */
-.mensagem{
-    width:100%;
-    padding:8px 10px;
-    margin-bottom:14px;
-    font-size:12.5px;
-    line-height:1.4;
-    border-radius:4px;
-}
-
-.mensagem--erro{
-    background:#FDECEC;
-    color:#A61B1B;
-}
-
-.mensagem--sucesso{
-    background:#EAF5EE;
-    color: var(--rp-verde-escuro);
-}
-
 
 /* ------ CONSERTO ------ */
 

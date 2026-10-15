@@ -13,7 +13,6 @@ const DIAS_AVISO_DETALHADO = 30;
 const ICONES = {
   entrega: '/images/avisos/icone-entrega-proxima.png',
   conserto: '/images/avisos/icone-conserto.png',
-  semEstoque: '/images/avisos/icone-produto-semEstoque.png'
 };
 
 function plural(numero, singular, pluralPalavra) {
@@ -41,9 +40,8 @@ async function buscarResumoGrafico() {
   };
 }
 
-// ---------- AVISOS IMPORTANTES ----------
+
 // ---------- AVISOS IMPORTANTES (painel da tela inicial) ----------
-// Mostra só as MAX_AVISOS atualizações mais recentes, da mais nova (topo) para a mais antiga
 async function buscarAvisos() {
   const [entregas] = await db.query(
     `SELECT id_conserto AS id, codigo,
@@ -82,18 +80,8 @@ async function buscarAvisos() {
     [DIAS_AVISO_RECENTE, MAX_AVISOS]
   );
 
-  // estoque = 0 é esgotado; NULL (estoque nunca informado) não conta
-  const [esgotados] = await db.query(
-    `SELECT id_produto AS id, nome, UNIX_TIMESTAMP(CURDATE()) AS ordem
-     FROM produto
-     WHERE ativo = 1 AND estoque = 0
-     ORDER BY id_produto DESC
-     LIMIT ?`,
-    [MAX_AVISOS]
-  );
 
-  // Entregas próximas e produtos esgotados são situações de hoje (não há data do evento
-  // no banco), então entram na ordenação com a data de hoje.
+  // Entregas próximas e produtos esgotados são situações de hoje (não há data do evento no banco), então entram na ordenação com a data de hoje.
   const [[{ hoje }]] = await db.query('SELECT UNIX_TIMESTAMP(CURDATE()) AS hoje');
 
   const codigo = (conserto) => (conserto.codigo ? `#${conserto.codigo}` : '(sem código)');
@@ -133,17 +121,8 @@ async function buscarAvisos() {
     id: Number(conserto.id)
   }));
 
-  const listaEsgotados = esgotados.map(produto => ({
-    tipo: 'esgotado',
-    icone: ICONES.semEstoque,
-    texto: `Produto esgotado: ${produto.nome}`,
-    ordem: Number(produto.ordem),
-    prioridade: 4,
-    id: Number(produto.id)
-  }));
-
   // Mais recente primeiro; só os MAX_AVISOS primeiros aparecem no painel
-  return [...listaEntregas, ...listaConcluidos, ...listaNovos, ...listaEsgotados]
+  return [...listaEntregas, ...listaConcluidos, ...listaNovos]
     .sort((a, b) => b.ordem - a.ordem || a.prioridade - b.prioridade || b.id - a.id)
     .slice(0, MAX_AVISOS);
 }
@@ -184,17 +163,6 @@ async function buscarTodosAvisos() {
      WHERE data_solicitada >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
      ORDER BY data_solicitada DESC`,
     [DIAS_AVISO_DETALHADO]
-  );
-
-  // estoque = 0 é esgotado; NULL (estoque nunca informado) não conta.
-  // A tabela não guarda a data em que o estoque zerou, então o aviso leva a data de hoje.
-  const [esgotados] = await db.query(
-    `SELECT nome,
-            DATE_FORMAT(CURDATE(), '%d/%m/%Y') AS data,
-            UNIX_TIMESTAMP(CURDATE()) AS ordem
-     FROM produto
-     WHERE ativo = 1 AND estoque = 0
-     ORDER BY id_produto DESC`
   );
 
   const codigo = (conserto) => (conserto.codigo ? `#${conserto.codigo}` : '(sem código)');
@@ -251,21 +219,6 @@ async function buscarTodosAvisos() {
       descricao: [{ texto: `${codigo(conserto)} ${aparelho}`.trim(), italico: true }],
       data: conserto.data,
       ordem: Number(conserto.ordem)
-    });
-  });
-
-  esgotados.forEach(produto => {
-    avisos.push({
-      categoria: 'loja',
-      icone: ICONES.semEstoque,
-      titulo: 'Produto indisponível no estoque da loja',
-      descricao: [
-        { texto: 'Produto ' },
-        { texto: produto.nome, italico: true },
-        { texto: ' esgotado' }
-      ],
-      data: produto.data,
-      ordem: Number(produto.ordem)
     });
   });
 

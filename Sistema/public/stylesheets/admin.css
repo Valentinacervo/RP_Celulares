@@ -1389,17 +1389,20 @@ object-fit:cover;
 }
 
 .avisos-cabecalho {
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
     margin-bottom: 26px;
+    padding: 0 30px;
+    box-sizing: border-box;
 }
 
 .avisos-titulo {
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 8px;
 }
 
 .avisos-titulo h1 {
@@ -1413,6 +1416,9 @@ object-fit:cover;
 .avisos-titulo .painel-avisos-seta {
     display: flex;
     align-items: center;
+    justify-content: center;
+    color: #222;
+    text-decoration: none;
 }
 
 /* Filtro */
