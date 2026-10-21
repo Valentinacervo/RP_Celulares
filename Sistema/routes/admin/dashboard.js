@@ -10,30 +10,6 @@ const { buscarResumoGrafico, buscarAvisos, buscarTodosAvisos, buscarNotas, salva
 // Depois disso ele só aparece no histórico do cliente (não é apagado do banco).
 const DIAS_CONSERTOS_CONCLUIDOS = 90;
 
-// Garante que a pasta exista.
-fs.mkdirSync(pastaFotos, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, pastaFotos);
-  },
-
-  filename: function (req, file, cb) {
-    const extensao = path.extname(file.originalname).toLowerCase();
-    const extensoesPermitidas = ['.jpg', '.jpeg', '.png', '.webp'];
-
-    if (!extensoesPermitidas.includes(extensao)) {
-      return cb(new Error('Formato de imagem não permitido.'));
-    }
-
-    const nomeArquivo = `perfil_${Date.now()}${extensao}`;
-    cb(null, nomeArquivo);
-  }
-});
-
-
-const upload = multer({ storage: storage });
-
 /* Middleware de Proteção */
 function verificarAutenticacao(req, res, next) {
   if (req.session.usuarioLogado) {
