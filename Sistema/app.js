@@ -19,6 +19,11 @@ var adminClientesRouter = require('./routes/admin/clientes');
 
 var app = express();
 
+var app = express();
+
+// Necessário no Render (proxy HTTPS) para o cookie de sessão seguro funcionar
+app.set('trust proxy', 1);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
