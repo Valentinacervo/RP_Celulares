@@ -33,21 +33,18 @@
         </div>
 
         <!-- Área do Admin com Dropdown-->
-        <div class="user-menu-container">
-            <div class="user">
-                <img src="<%= usuario.foto || '/images/valentina.jpg' %>" class="user-photo" id="fotoPerfil" alt="Foto do usuário">
-                <span>Admin - Rodrigo </span>
-            </div>
+    <div class="user-menu-container">
+      <div class="user">
+        <i class="bi bi-person-circle user-icon"></i>
+        <span>Admin - Rodrigo</span>
+      </div>
 
-            <div class="user-dropdown">
-                <a href="#" id="btnMudarFoto">
-                    <i class="bi bi-camera-fill"></i> Mudar foto
-                </a>
-                <a href="/logout" class="btn-sair">
-                    <i class="bi bi-box-arrow-right"></i> Sair do sistema
-                </a>
-            </div>
-        </div>
+      <div class="user-dropdown">
+        <a href="/logout" class="btn-sair">
+          <i class="bi bi-box-arrow-right"></i> Sair do sistema
+        </a>
+      </div>
+    </div>
 
         <!-- FORMULÁRIO ESCONDIDO PARA UPLOAD -->
         <form id="formFoto" action="/admin/upload-foto" method="POST" enctype="multipart/form-data" style="display: none;">
@@ -343,18 +340,6 @@
     </div>
 
 <script>
-    // ---------- FOTO DO ADMIN ----------
-    document.getElementById('btnMudarFoto').addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('inputFoto').click();
-    });
-
-    document.getElementById('inputFoto').addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            document.getElementById('formFoto').submit();
-        }
-    });
-
     // ---------- MÁSCARAS ----------
     function formatarTelefone(valor) {
         let v = String(valor || '').replace(/\D/g, '').slice(0, 11);

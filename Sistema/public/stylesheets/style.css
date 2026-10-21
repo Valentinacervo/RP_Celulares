@@ -30,6 +30,170 @@ body {
   color: white;
 }
 
+
+/* ===== RODAPÉ RP CELULARES ===== */
+
+.rodape-rp {
+    width: 100%;
+    background-color: #1e3d2f;
+    color: #ffffff;
+    padding: 24px 5%;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+.rodape-container {
+    max-width: 1250px;
+    margin: 0 auto;
+
+    /* Mantém as duas colunas lado a lado */
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    column-gap: 100px;
+    align-items: start;
+}
+
+/* LADO ESQUERDO */
+
+.rodape-institucional {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.rodape-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    margin: 8px;
+    color: #ffffff;
+    font-size: 27px;
+    font-weight: 700;
+}
+
+.rodape-titulo i {
+    font-size: 24px;
+}
+
+.rodape-slogan {
+    max-width: 380px;
+    margin: 0 0 22px;
+    color: #f0f4f0;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* REDES SOCIAIS */
+
+.rodape-redes {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.rodape-redes a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 21px;
+    text-decoration: none;
+    transition: color 0.2s ease,
+                transform 0.2s ease;
+}
+
+.rodape-redes a:hover {
+    color: #a8d5ad;
+    transform: translateY(-2px);
+}
+
+/* HORÁRIO */
+
+.rodape-horario {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0;
+    color: #f0f4f0;
+    font-size: 12px;
+}
+
+.rodape-horario i {
+    font-size: 16px;
+}
+
+/* LADO DIREITO: CONTATO */
+
+.rodape-contato {
+    min-width: 0;
+}
+
+.rodape-contato h3 {
+    margin: 0 0 24px;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.rodape-contato ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rodape-contato li {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    color: #f0f4f0;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.rodape-contato li > i {
+    margin-top: 0;
+    font-size: 14px;
+}
+
+.rodape-contato a {
+    color: #f0f4f0;
+    text-decoration: none;
+}
+
+.rodape-contato a:hover {
+    color: #a8d5ad;
+    text-decoration: underline;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 700px) {
+    .rodape-rp {
+        padding: 24px 20px;
+    }
+
+    .rodape-container {
+        grid-template-columns: 1fr;
+        row-gap: 24px;
+    }
+
+    .rodape-titulo {
+        font-size: 24px;
+    }
+
+    .rodape-contato h3 {
+        margin-bottom: 18px;
+    }
+}
+
+
 /* ------- NAVBAR 1 - INDEX/SOBRE NÓS ------- */
 
 .navbar-custom {
@@ -447,14 +611,12 @@ body {
 
 .conserto-hero-text h1 {
   font-size: 25px;
-  margin-top: -60px;
+  margin-top: -25px;
   color: #111;
   font-weight: bold;
   line-height: 1;
   max-width: 400px;
 }
-
-
 
 .conserto-hero-text p {
   font-size: 14px;
@@ -513,7 +675,7 @@ font-family: 'Poppins', sans-serif;
 .servico-card {
   background: #f5f8f0;
   border-radius: 24px;
-  padding: 28px 18px;
+  padding: 24px 14px;
   text-align: center;
   min-height: 180px;
   display: flex;

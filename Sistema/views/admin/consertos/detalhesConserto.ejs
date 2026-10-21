@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - RP Celulares</title>
+
+  <link rel="stylesheet" href="/stylesheets/admin.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+
+<body>
+  <header class="navbar">
+    <div class="logo">RP</div>
+
+    <nav class="nav-buttons">
+      <a href="/admin" class="active">Consertos</a>
+      <a href="/admin/clientes">Clientes</a>
+    </nav>
+
+        <div class="user-menu-container">
+      <div class="user">
+        <i class="bi bi-person-circle user-icon"></i>
+        <span>Admin - Rodrigo</span>
+      </div>
+
+      <div class="user-dropdown">
+        <a href="/logout" class="btn-sair">
+          <i class="bi bi-box-arrow-right"></i> Sair do sistema
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="content pagina-detalhes-cliente">
+    <div class="detalhes-container">
+      <div class="detalhes-topo">
+        <div>
+          <h1>Detalhes do conserto</h1>
+          <p>
+            Código: #<%= conserto.codigo %>
+            <% if (conserto.status === 'concluido') { %>
+              <span class="conserto-status conserto-status--concluido">Concluído</span>
+            <% } else { %>
+              <span class="conserto-status conserto-status--pendente">Pendente</span>
+            <% } %>
+          </p>
+        </div>
+
+        <div class="detalhes-topo-acoes">
+          <% if (conserto.id_cliente) { %>
+            <a href="/admin/clientes/<%= conserto.id_cliente %>" class="btn-voltar">
+              <i class="bi bi-person-fill"></i> Ver cliente
+            </a>
+          <% } %>
+
+          <a href="/admin/todosconsertos" class="btn-voltar">
+            <i class="bi bi-arrow-left"></i> Voltar aos consertos
+          </a>
+        </div>
+      </div>
+
+      <% if (erro) { %>
+        <div class="mensagem-sucesso" style="background:#f8d7da;color:#842029">
+          <%= erro %>
+        </div>
+      <% } %>
+
+      <% if (sucesso) { %>
+        <div class="mensagem-sucesso">
+          <%= sucesso %>
+        </div>
+      <% } %>
+
+      <!-- DADOS DO CONSERTO -->
+      <section class="form-card detalhes-secao">
+
+        <form action="/admin/consertos/<%= conserto.codigo %>/editar" method="POST" id="formConserto">
+
+          <h2><i class="bi bi-person-lines-fill"></i> Dados do cliente</h2>
+
+          <div class="form-grid">
+            <div class="campo">
+              <label for="cliente_nome">Nome completo *</label>
+              <input id="cliente_nome" name="cliente_nome" maxlength="100"
+                     value="<%= valores.cliente_nome %>" required>
+            </div>
+
+            <div class="campo">
+              <label>Código do cliente</label>
+              <input value="<%= conserto.cliente_codigo ? '#' + conserto.cliente_codigo : '' %>" readonly>
+            </div>
+
+            <div class="campo">
+              <label for="cliente_telefone">Telefone *</label>
+              <input id="cliente_telefone" name="cliente_telefone" maxlength="15"
+                     placeholder="(00) 00000-0000"
+                     value="<%= valores.cliente_telefone %>" required>
+            </div>
+
+            <div class="campo">
+              <label for="cliente_email">E-mail *</label>
+              <input id="cliente_email" type="email" name="cliente_email" maxlength="100"
+                     value="<%= valores.cliente_email %>" required>
+            </div>
+
+            <div class="campo">
+              <label for="cliente_contato_adicional">Contato adicional</label>
+              <input id="cliente_contato_adicional" name="cliente_contato_adicional" maxlength="15"
+                     placeholder="(00) 00000-0000"
+                     value="<%= valores.cliente_contato_adicional %>">
+            </div>
+          </div>
+
+          <h2 style="margin-top:28px"><i class="bi bi-tools"></i> Dados do conserto</h2>
+
+          <div class="form-grid">
+            <div class="campo">
+              <label>Data de abertura</label>
+              <input value="<%= conserto.data_abertura || 'Não informada' %>" readonly>
+            </div>
+
+            <div class="campo">
+              <label for="data_prometida">Previsão de entrega *</label>
+              <input id="data_prometida" type="date" name="data_prometida"
+                     min="<%= conserto.data_abertura_iso || '' %>"
+                     value="<%= valores.data_prometida %>" required>
+            </div>
+
+            <% if (conserto.status === 'concluido') { %>
+              <div class="campo">
+                <label>Data de conclusão</label>
+                <input value="<%= conserto.data_conclusao_br || 'Não informada' %>" readonly>
+              </div>
+            <% } %>
+
+            <div class="campo">
+              <label for="tipo_aparelho">Tipo de aparelho *</label>
+              <input id="tipo_aparelho" name="tipo_aparelho" list="lista-tipos" maxlength="30"
+                     value="<%= valores.tipo_aparelho %>" required>
+              <datalist id="lista-tipos">
+                <% opcoes.tiposAparelho.filter(o => o !== 'Outro').forEach(o => { %>
+                  <option value="<%= o %>">
+                <% }) %>
+              </datalist>
+            </div>
+
+            <div class="campo">
+              <label for="marca">Marca *</label>
+              <input id="marca" name="marca" list="lista-marcas" maxlength="50"
+                     value="<%= valores.marca %>" required>
+              <datalist id="lista-marcas">
+                <% opcoes.marcas.filter(o => o !== 'Outra').forEach(o => { %>
+                  <option value="<%= o %>">
+                <% }) %>
+              </datalist>
+            </div>
+
+            <div class="campo">
+              <label for="modelo">Modelo *</label>
+              <input id="modelo" name="modelo" maxlength="100"
+                     value="<%= valores.modelo %>" required>
+            </div>
+
+            <div class="campo">
+              <label for="tipo_conserto">Serviço solicitado *</label>
+              <input id="tipo_conserto" name="tipo_conserto" list="lista-servicos" maxlength="100"
+                     value="<%= valores.tipo_conserto %>" required>
+              <datalist id="lista-servicos">
+                <% opcoes.servicos.filter(o => o !== 'Outro').forEach(o => { %>
+                  <option value="<%= o %>">
+                <% }) %>
+              </datalist>
+            </div>
+
+            <div class="campo campo-largo">
+              <label for="acessorios">Acessórios deixados</label>
+              <textarea id="acessorios" name="acessorios" maxlength="200" rows="3"
+                        placeholder="Ex.: carregador, capinha ou nenhum"><%= valores.acessorios %></textarea>
+            </div>
+
+            <div class="campo campo-largo">
+              <label for="descricao_problema">Descrição do problema *</label>
+              <textarea id="descricao_problema" name="descricao_problema"
+                        maxlength="500" rows="3" required><%= valores.descricao_problema %></textarea>
+            </div>
+
+            <div class="campo campo-largo">
+              <label for="observacoes_tecnicas">Observações técnicas</label>
+              <textarea id="observacoes_tecnicas" name="observacoes_tecnicas"
+                        maxlength="500" rows="3"><%= valores.observacoes_tecnicas %></textarea>
+            </div>
+
+            <div class="campo">
+              <label for="valor">Valor (R$)</label>
+              <input id="valor" type="number" name="valor" step="0.01" min="0"
+                     placeholder="0,00" value="<%= valores.valor %>">
+            </div>
+
+            <div class="campo">
+              <label for="forma_pagamento">Forma de pagamento</label>
+              <select id="forma_pagamento" name="forma_pagamento">
+                <option value="">Selecione</option>
+
+                <% if (valores.forma_pagamento && !opcoes.formasPagamento.includes(valores.forma_pagamento)) { %>
+                  <option value="<%= valores.forma_pagamento %>" selected><%= valores.forma_pagamento %></option>
+                <% } %>
+
+                <% opcoes.formasPagamento.forEach(forma => { %>
+                  <option value="<%= forma %>" <%= valores.forma_pagamento === forma ? 'selected' : '' %>><%= forma %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="campo">
+              <label for="garantia_dias">Garantia</label>
+              <select id="garantia_dias" name="garantia_dias">
+                <option value="">Selecione</option>
+
+                <% opcoes.garantias.forEach(garantia => { %>
+                  <option value="<%= garantia.valor %>" <%= String(valores.garantia_dias) === String(garantia.valor) ? 'selected' : '' %>><%= garantia.rotulo %></option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+
+          <div class="acoes-formulario">
+            <button type="submit" class="btn-salvar">
+              <i class="bi bi-floppy2-fill"></i> Salvar alterações
+            </button>
+
+            <% if (conserto.status === 'concluido') { %>
+              <button type="submit" form="formReabrir" class="btn-salvar btn-reabrir">
+                <i class="bi bi-arrow-counterclockwise"></i> Reabrir conserto
+              </button>
+            <% } else { %>
+              <button type="submit" form="formConcluir" class="btn-salvar btn-concluir">
+                <i class="bi bi-check-circle-fill"></i> Marcar como concluído
+              </button>
+            <% } %>
+
+            <a href="/admin/todosconsertos" class="btn-voltar">Cancelar</a>
+          </div>
+        </form>
+
+        <form id="formConcluir" action="/admin/consertos/<%= conserto.codigo %>/concluir" method="POST"
+              onsubmit="return confirm('Marcar este conserto como concluído?');"></form>
+
+        <form id="formReabrir" action="/admin/consertos/<%= conserto.codigo %>/reabrir" method="POST"
+              onsubmit="return confirm('Reabrir este conserto? Ele voltará para pendente.');"></form>
+      </section>
+    </div>
+  </main>
+
+  <script>
+        // Máscara de telefone: (00) 00000-0000
+    function formatarTelefone(valor) {
+      let v = String(valor || '').replace(/\D/g, '').slice(0, 11);
+      if (v.length > 6) {
+        v = v.replace(/^(\d{2})(\d{4,5})(\d{0,4}).*/, '($1) $2-$3');
+      } else if (v.length > 2) {
+        v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+      } else if (v.length > 0) {
+        v = v.replace(/^(\d*)/, '($1');
+      }
+      return v;
+    }
+
+    ['cliente_telefone', 'cliente_contato_adicional'].forEach(function (id) {
+      const campo = document.getElementById(id);
+      campo?.addEventListener('input', function () {
+        this.value = formatarTelefone(this.value);
+      });
+    });
+  </script>
+</body>
+</html>

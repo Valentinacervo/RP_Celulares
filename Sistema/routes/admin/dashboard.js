@@ -1,25 +1,36 @@
 var express = require('express');
 var router = express.Router();
-const multer = require('multer'); 
-const path = require('path');
-const fs = require('fs');
 const db = require('../../db');
 const { gerarCodigoCliente } = require('../../utils/codigoCliente');
 const opcoes = require('../../utils/opcoesConserto');
 const { gerarCodigoConserto } = require('../../utils/codigoConserto');
 const { buscarResumoGrafico, buscarAvisos, buscarTodosAvisos, buscarNotas, salvarNotas } = require('../../utils/painelConsertos');
 
-/* Configuração do Multer (upload de foto) */
+// Por quantos dias um conserto concluído continua aparecendo em "Consertos concluídos".
+// Depois disso ele só aparece no histórico do cliente (não é apagado do banco).
+const DIAS_CONSERTOS_CONCLUIDOS = 90;
+
+// Garante que a pasta exista.
+fs.mkdirSync(pastaFotos, { recursive: true });
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/images/perfil/'); 
+    cb(null, pastaFotos);
   },
+
   filename: function (req, file, cb) {
-    const extensao = path.extname(file.originalname);
-    const nomeArquivo = req.session.usuarioLogado.nome_usuario + '_' + Date.now() + extensao;
+    const extensao = path.extname(file.originalname).toLowerCase();
+    const extensoesPermitidas = ['.jpg', '.jpeg', '.png', '.webp'];
+
+    if (!extensoesPermitidas.includes(extensao)) {
+      return cb(new Error('Formato de imagem não permitido.'));
+    }
+
+    const nomeArquivo = `perfil_${Date.now()}${extensao}`;
     cb(null, nomeArquivo);
   }
 });
+
 
 const upload = multer({ storage: storage });
 
@@ -67,30 +78,6 @@ router.post('/bloco-notas', verificarAutenticacao, async function(req, res, next
     next(err);
   }
 });
-
-/* Rota de Upload da Foto */
-router.post('/upload-foto', verificarAutenticacao, upload.single('foto'), function(req, res) {
-  if (!req.file) {
-    return res.status(400).send('Nenhuma foto foi enviata.');
-  }
-
-  // Apaga a foto anterior, se existir e não for a imagem padrão
-  const fotoAntiga = req.session.usuarioLogado.foto;
-  if (fotoAntiga && !fotoAntiga.includes('valentina.jpg')) {
-    const caminhoFotoAntiga = path.join(__dirname, '..', '..', 'public', fotoAntiga);
-    fs.unlink(caminhoFotoAntiga, (err) => {
-      if (err) {
-        console.error('Não foi possível apagar a foto antiga:', err.message);
-      }
-    });
-  }
-
-  const caminhoFoto = '/images/perfil/' + req.file.filename;
-  req.session.usuarioLogado.foto = caminhoFoto;
-
-  res.redirect('/admin'); 
-});
-
 
 /* ------ CADASTRO DE CONSERTO ------ */
 
@@ -416,7 +403,7 @@ router.post('/adicionarconserto', verificarAutenticacao, async function(req, res
 
 /* ------ LISTAGEM DE CONSERTOS ------ */
 
-async function listarConsertos(req, res, next, { status, destacados, titulo, paginaAtual, vazio }) {
+async function listarConsertos(req, res, next, { status, destacados, ultimosDias, titulo, paginaAtual, vazio }) {
   try {
     const busca = (req.query.busca || '').toString().replace('#', '').trim();
 
@@ -445,6 +432,12 @@ async function listarConsertos(req, res, next, { status, destacados, titulo, pag
       condicoes.push('conserto.destacado = 1');
     }
 
+    // Limita pela data de conclusão (ou, se faltar, pela data de abertura)
+    if (ultimosDias) {
+      condicoes.push('COALESCE(conserto.data_conclusao, conserto.data_solicitada) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)');
+      params.push(ultimosDias);
+    }
+
     if (busca) {
       condicoes.push('(conserto.codigo LIKE ? OR conserto.tipo_conserto LIKE ? OR cliente.nome LIKE ?)');
       params.push(`%${busca}%`, `%${busca}%`, `%${busca}%`);
@@ -460,7 +453,8 @@ async function listarConsertos(req, res, next, { status, destacados, titulo, pag
       usuario: req.session.usuarioLogado,
       consertos,
       busca,
-      vazio
+      vazio,
+      ultimosDias: ultimosDias || null
     });
   } catch (err) {
     next(err);
@@ -488,9 +482,10 @@ router.get('/consertospendentes', verificarAutenticacao, function(req, res, next
 router.get('/consertosconcluidos', verificarAutenticacao, function(req, res, next) {
   listarConsertos(req, res, next, {
     status: 'concluido',
+    ultimosDias: DIAS_CONSERTOS_CONCLUIDOS,
     titulo: 'Consertos Concluídos',
     paginaAtual: 'consertosconcluidos',
-    vazio: 'Nenhum conserto concluído.'
+    vazio: `Nenhum conserto concluído nos últimos ${DIAS_CONSERTOS_CONCLUIDOS} dias.`
   });
 });
 
@@ -540,6 +535,317 @@ router.get('/avisosImportantes', verificarAutenticacao, async function(req, res,
       usuario: req.session.usuarioLogado,
       avisos
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/* ------ DETALHES DO CONSERTO ------ */
+
+const REGEX_CODIGO_CONSERTO = /^\d{5}$/;
+
+const MENSAGENS_CONSERTO = {
+  salvo: 'Dados do conserto atualizados com sucesso.',
+  concluido: 'Conserto marcado como concluído.',
+  reaberto: 'Conserto reaberto: voltou para pendente.'
+};
+
+async function buscarConsertoPorCodigo(codigo) {
+  const [linhas] = await db.query(
+    `SELECT
+       co.id_conserto, co.codigo, co.id_cliente, co.status,
+       co.tipo_aparelho, co.marca, co.modelo, co.acessorios,
+       co.tipo_conserto, co.descricao_problema, co.observacoes_tecnicas,
+       co.valor, co.forma_pagamento, co.garantia_dias,
+       DATE_FORMAT(co.data_solicitada, '%d/%m/%Y') AS data_abertura,
+       DATE_FORMAT(co.data_solicitada, '%Y-%m-%d') AS data_abertura_iso,
+       DATE_FORMAT(co.data_prometida, '%Y-%m-%d') AS data_prevista_iso,
+       DATE_FORMAT(co.data_conclusao, '%d/%m/%Y') AS data_conclusao_br,
+       cl.codigo AS cliente_codigo,
+       cl.nome AS cliente_nome,
+       cl.telefone AS cliente_telefone,
+       cl.email AS cliente_email,
+       cl.contato_adicional AS cliente_contato_adicional
+     FROM conserto co
+     LEFT JOIN cliente cl ON cl.id_cliente = co.id_cliente
+     WHERE co.codigo = ?
+     LIMIT 1`,
+    [codigo]
+  );
+
+  return linhas[0] || null;
+}
+
+// Valores que aparecem nos campos editáveis (do banco ou, se deu erro, do que foi digitado)
+function valoresDoConserto(c) {
+  return {
+    data_prometida: c.data_prevista_iso || '',
+    tipo_aparelho: c.tipo_aparelho || '',
+    marca: c.marca || '',
+    modelo: c.modelo || '',
+    acessorios: c.acessorios || '',
+    tipo_conserto: c.tipo_conserto || '',
+    descricao_problema: c.descricao_problema || '',
+    observacoes_tecnicas: c.observacoes_tecnicas || '',
+    valor: c.valor ?? '',
+    forma_pagamento: c.forma_pagamento || '',
+    valor: c.valor ?? '',
+    forma_pagamento: c.forma_pagamento || '',
+    garantia_dias: c.garantia_dias ?? '',
+    cliente_nome: c.cliente_nome || '',
+    cliente_telefone: c.cliente_telefone || '',
+    cliente_email: c.cliente_email || '',
+    cliente_contato_adicional: c.cliente_contato_adicional || ''
+  };
+}
+function renderDetalhesConserto(req, res, conserto, { erro = null, sucesso = null, valores = null } = {}) {
+  res.render('admin/consertos/detalhesConserto', {
+    title: 'Detalhes do Conserto',
+    usuario: req.session.usuarioLogado,
+    conserto,
+    valores: valores || valoresDoConserto(conserto),
+    opcoes,
+    erro,
+    sucesso
+  });
+}
+
+function tratarEdicaoConserto(body, dataAbertura) {
+  const t = (campo) => (body[campo] || '').toString().trim();
+
+  const obrigatorios = [
+    ['data_prometida', 'a data prevista de entrega'],
+    ['tipo_aparelho', 'o tipo de aparelho'],
+    ['marca', 'a marca do aparelho'],
+    ['modelo', 'o modelo do aparelho'],
+    ['tipo_conserto', 'o serviço solicitado'],
+    ['descricao_problema', 'a descrição do problema']
+  ];
+
+  for (const [campo, rotulo] of obrigatorios) {
+    if (!t(campo)) throw new ErroFormulario(`Preencha ${rotulo}.`);
+  }
+
+  const limites = {
+    tipo_aparelho: ['tipo de aparelho', 30],
+    marca: ['marca', 50],
+    modelo: ['modelo', 100],
+    acessorios: ['acessórios', 200],
+    tipo_conserto: ['serviço solicitado', 100],
+    descricao_problema: ['descrição do problema', 500],
+    observacoes_tecnicas: ['observações técnicas', 500]
+  };
+  for (const [campo, [rotulo, max]] of Object.entries(limites)) {
+    if (t(campo).length > max) {
+      throw new ErroFormulario(`O campo "${rotulo}" aceita no máximo ${max} caracteres.`);
+    }
+  }
+
+  if (!REGEX_DATA.test(t('data_prometida'))) {
+    throw new ErroFormulario('Data prevista inválida.');
+  }
+  if (dataAbertura && t('data_prometida') < dataAbertura) {
+    throw new ErroFormulario('A data prevista de entrega não pode ser anterior à data de abertura.');
+  }
+
+  const formaPagamento = t('forma_pagamento');
+  if (formaPagamento && formaPagamento.length > 50) {
+    throw new ErroFormulario('Forma de pagamento inválida.');
+  }
+
+  let garantiaDias = null;
+  if (t('garantia_dias') !== '') {
+    garantiaDias = Number(t('garantia_dias'));
+    if (!opcoes.garantias.some(g => g.valor === garantiaDias)) throw new ErroFormulario('Garantia inválida.');
+  }
+
+  let valor = null;
+  if (t('valor') !== '') {
+    valor = Number(t('valor'));
+    if (!Number.isFinite(valor) || valor < 0) throw new ErroFormulario('Valor inválido.');
+    valor = Math.round(valor * 100) / 100;
+  }
+  // Dados do cliente (também podem ser corrigidos por esta tela)
+  if (!t('cliente_nome')) throw new ErroFormulario('Preencha o nome completo do cliente.');
+  if (t('cliente_nome').length > 100) {
+    throw new ErroFormulario('O nome do cliente aceita no máximo 100 caracteres.');
+  }
+
+  if (!t('cliente_telefone')) throw new ErroFormulario('Preencha o telefone do cliente.');
+  if (!REGEX_TELEFONE.test(t('cliente_telefone'))) {
+    throw new ErroFormulario('Telefone inválido. Use o formato (00) 00000-0000.');
+  }
+
+  if (t('cliente_contato_adicional') && !REGEX_TELEFONE.test(t('cliente_contato_adicional'))) {
+    throw new ErroFormulario('Contato adicional inválido. Use o formato (00) 00000-0000.');
+  }
+
+  if (!t('cliente_email')) throw new ErroFormulario('Preencha o e-mail do cliente.');
+  if (t('cliente_email').length > 100) {
+    throw new ErroFormulario('O e-mail do cliente aceita no máximo 100 caracteres.');
+  }
+  if (!/^\S+@\S+\.\S+$/.test(t('cliente_email'))) {
+    throw new ErroFormulario('E-mail inválido.');
+  }
+
+  return {
+    conserto: [
+      t('data_prometida'), t('tipo_aparelho'), t('marca'), t('modelo'),
+      t('acessorios') || null, t('tipo_conserto'), t('descricao_problema'),
+      t('observacoes_tecnicas') || null, valor, formaPagamento || null, garantiaDias
+    ],
+    cliente: [
+      t('cliente_nome'), t('cliente_telefone'), t('cliente_email'),
+      t('cliente_contato_adicional') || null
+    ]
+  };
+}
+
+/* GET detalhes do conserto */
+router.get('/consertos/:codigo', verificarAutenticacao, async function(req, res, next) {
+  try {
+    if (!REGEX_CODIGO_CONSERTO.test(req.params.codigo)) {
+      return res.status(400).send('Código de conserto inválido.');
+    }
+
+    const conserto = await buscarConsertoPorCodigo(req.params.codigo);
+    if (!conserto) {
+      return res.status(404).send('Conserto não encontrado.');
+    }
+
+    renderDetalhesConserto(req, res, conserto, {
+      sucesso: MENSAGENS_CONSERTO[req.query.msg] || null
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/* POST salvar alterações do conserto */
+/* POST salvar alterações do conserto (e dos dados do cliente) */
+router.post('/consertos/:codigo/editar', verificarAutenticacao, async function(req, res, next) {
+  let conexao;
+
+  try {
+    if (!REGEX_CODIGO_CONSERTO.test(req.params.codigo)) {
+      return res.status(400).send('Código de conserto inválido.');
+    }
+
+    const conserto = await buscarConsertoPorCodigo(req.params.codigo);
+    if (!conserto) {
+      return res.status(404).send('Conserto não encontrado.');
+    }
+
+    const dados = tratarEdicaoConserto(req.body, conserto.data_abertura_iso);
+
+    conexao = await db.getConnection();
+    await conexao.beginTransaction();
+
+    if (conserto.id_cliente) {
+      const [nome, telefone, email] = dados.cliente;
+
+      // Telefone e e-mail não podem pertencer a outro cliente
+      const [telefoneEmUso] = await conexao.query(
+        'SELECT 1 FROM cliente WHERE telefone = ? AND id_cliente <> ? LIMIT 1',
+        [telefone, conserto.id_cliente]
+      );
+      if (telefoneEmUso.length > 0) {
+        throw new ErroFormulario('Já existe outro cliente cadastrado com esse telefone.');
+      }
+
+      const [emailEmUso] = await conexao.query(
+        'SELECT 1 FROM cliente WHERE email = ? AND id_cliente <> ? LIMIT 1',
+        [email, conserto.id_cliente]
+      );
+      if (emailEmUso.length > 0) {
+        throw new ErroFormulario('Já existe outro cliente cadastrado com esse e-mail.');
+      }
+
+      await conexao.query(
+        `UPDATE cliente
+         SET nome = ?, telefone = ?, email = ?, contato_adicional = ?
+         WHERE id_cliente = ?`,
+        [...dados.cliente, conserto.id_cliente]
+      );
+    }
+
+    await conexao.query(
+      `UPDATE conserto
+       SET data_prometida = ?, tipo_aparelho = ?, marca = ?, modelo = ?,
+           acessorios = ?, tipo_conserto = ?, descricao_problema = ?,
+           observacoes_tecnicas = ?, valor = ?, forma_pagamento = ?, garantia_dias = ?
+       WHERE id_conserto = ?`,
+      [...dados.conserto, conserto.id_conserto]
+    );
+
+    await conexao.commit();
+    res.redirect(`/admin/consertos/${conserto.codigo}?msg=salvo`);
+
+  } catch (err) {
+    if (conexao) await conexao.rollback().catch(() => {});
+
+    if (err instanceof ErroFormulario) {
+      try {
+        const conserto = await buscarConsertoPorCodigo(req.params.codigo);
+        res.status(400);
+        return renderDetalhesConserto(req, res, conserto, {
+          erro: err.message,
+          valores: { ...valoresDoConserto(conserto), ...req.body }
+        });
+      } catch (erroTela) {
+        return next(erroTela);
+      }
+    }
+    next(err);
+
+  } finally {
+    if (conexao) conexao.release();
+  }
+});
+
+/* POST marcar como concluído (grava a data de conclusão, que conta os 90 dias) */
+router.post('/consertos/:codigo/concluir', verificarAutenticacao, async function(req, res, next) {
+  try {
+    if (!REGEX_CODIGO_CONSERTO.test(req.params.codigo)) {
+      return res.status(400).send('Código de conserto inválido.');
+    }
+
+    const [resultado] = await db.query(
+      `UPDATE conserto
+       SET status = 'concluido', data_conclusao = CURDATE()
+       WHERE codigo = ? AND status <> 'concluido'`,
+      [req.params.codigo]
+    );
+
+    if (resultado.affectedRows === 0 && !(await buscarConsertoPorCodigo(req.params.codigo))) {
+      return res.status(404).send('Conserto não encontrado.');
+    }
+
+    res.redirect(`/admin/consertos/${req.params.codigo}?msg=concluido`);
+  } catch (err) {
+    next(err);
+  }
+});
+
+/* POST reabrir conserto (volta para pendente e limpa a data de conclusão) */
+router.post('/consertos/:codigo/reabrir', verificarAutenticacao, async function(req, res, next) {
+  try {
+    if (!REGEX_CODIGO_CONSERTO.test(req.params.codigo)) {
+      return res.status(400).send('Código de conserto inválido.');
+    }
+
+    const [resultado] = await db.query(
+      `UPDATE conserto
+       SET status = 'pendente', data_conclusao = NULL
+       WHERE codigo = ? AND status = 'concluido'`,
+      [req.params.codigo]
+    );
+
+    if (resultado.affectedRows === 0 && !(await buscarConsertoPorCodigo(req.params.codigo))) {
+      return res.status(404).send('Conserto não encontrado.');
+    }
+
+    res.redirect(`/admin/consertos/${req.params.codigo}?msg=reaberto`);
   } catch (err) {
     next(err);
   }

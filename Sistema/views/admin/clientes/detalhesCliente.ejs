@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - RP Celulares</title>
+
+  <link rel="stylesheet" href="/stylesheets/admin.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+
+<body>
+  <header class="navbar">
+    <div class="logo">RP</div>
+
+    <nav class="nav-buttons">
+      <a href="/admin">Consertos</a>
+      <a href="/admin/clientes" class="active">Clientes</a>
+    </nav>
+
+    <div class="user-menu-container">
+      <div class="user">
+        <i class="bi bi-person-circle user-icon"></i>
+        <span>Admin - Rodrigo</span>
+      </div>
+
+      <div class="user-dropdown">
+        <a href="/logout" class="btn-sair">
+          <i class="bi bi-box-arrow-right"></i> Sair do sistema
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="content pagina-detalhes-cliente">
+    <div class="detalhes-container">
+      <div class="detalhes-topo">
+        <div>
+          <h1>Detalhes do cliente</h1>
+          <p>
+            Código: #<%= cliente.codigo || cliente.id_cliente %>
+          </p>
+        </div>
+
+        <a href="/admin/clientes" class="btn-voltar">
+          <i class="bi bi-arrow-left"></i> Voltar aos clientes
+        </a>
+      </div>
+
+      <% if (erro) { %>
+        <div class="mensagem-sucesso" style="background:#f8d7da;color:#842029">
+          <%= erro %>
+        </div>
+      <% } %>
+
+      <section class="form-card detalhes-secao">
+        <h2><i class="bi bi-person-lines-fill"></i> Dados pessoais</h2>
+
+        <form action="/admin/clientes/<%= cliente.id_cliente %>/editar"
+              method="POST">
+
+          <div class="form-grid">
+            <div class="campo">
+              <label for="nome">Nome completo *</label>
+              <input id="nome" name="nome" maxlength="100"
+                     value="<%= cliente.nome || '' %>" required>
+            </div>
+
+            <div class="campo">
+              <label for="cpf">CPF</label>
+              <input id="cpf" name="cpf" maxlength="14"
+                     placeholder="000.000.000-00"
+                     value="<%= cliente.cpf || '' %>">
+            </div>
+
+            <div class="campo">
+              <label for="data_nasc">Data de nascimento</label>
+              <input id="data_nasc" type="date" name="data_nasc"
+                     value="<%= cliente.data_nasc ? new Date(cliente.data_nasc).toISOString().slice(0, 10) : '' %>">
+            </div>
+
+            <div class="campo">
+              <label for="telefone">Telefone *</label>
+              <input id="telefone" name="telefone"
+                     placeholder="(00) 00000-0000"
+                     maxlength="15"
+                     value="<%= cliente.telefone || '' %>" required>
+            </div>
+
+            <div class="campo">
+              <label for="email">E-mail *</label>
+              <input id="email" type="email" name="email"
+                     maxlength="100"
+                     value="<%= cliente.email || '' %>" required>
+            </div>
+
+            <div class="campo">
+              <label for="contato_adicional">Contato adicional</label>
+              <input id="contato_adicional" name="contato_adicional"
+                     placeholder="(00) 00000-0000"
+                     maxlength="15"
+                     value="<%= cliente.contato_adicional || '' %>">
+            </div>
+          </div>
+
+          <h2 style="margin-top:28px">
+            <i class="bi bi-geo-alt"></i> Endereço
+          </h2>
+
+          <div class="form-grid">
+            <div class="campo">
+              <label for="rua">Rua / Avenida *</label>
+              <input id="rua" name="rua" maxlength="30"
+                     value="<%= cliente.rua || '' %>" required>
+            </div>
+
+            <div class="campo">
+              <label for="numero">Número *</label>
+              <input id="numero" name="numero" type="number" min="0"
+                     value="<%= cliente.numero ?? '' %>" required>
+            </div>
+
+            <div class="campo">
+              <label for="complemento">Complemento</label>
+              <input id="complemento" name="complemento" maxlength="50"
+                     value="<%= cliente.complemento || '' %>">
+            </div>
+
+            <div class="campo">
+              <label for="bairro">Bairro *</label>
+              <input id="bairro" name="bairro" maxlength="50"
+                     value="<%= cliente.bairro || '' %>" required>
+            </div>
+
+            <div class="campo">
+              <label for="cep">CEP *</label>
+              <input id="cep" name="cep" maxlength="9"
+                     value="<%= cliente.cep || '' %>" required>
+            </div>
+
+            <div class="campo">
+              <label for="cidade">Cidade *</label>
+              <input id="cidade" name="cidade" maxlength="50"
+                     value="<%= cliente.cidade || '' %>" required>
+            </div>
+
+            <div class="campo">
+              <label for="id_uf">Estado *</label>
+              <select id="id_uf" name="id_uf" required>
+                <option value="">Selecione</option>
+
+                <% ufs.forEach(uf => { %>
+                  <option
+                    value="<%= uf.id_uf %>"
+                    <%= String(cliente.id_uf) === String(uf.id_uf) ? 'selected' : '' %>>
+                    <%= uf.descricao %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+
+          <div class="acoes-formulario">
+            <button type="submit" class="btn-salvar">
+              <i class="bi bi-floppy2-fill"></i> Salvar alterações
+            </button>
+
+            <a href="/admin/clientes" class="btn-voltar">
+              Cancelar
+            </a>
+          </div>
+        </form>
+      </section>
+
+      <section class="detalhes-secao">
+        <h2>
+          <i class="bi bi-tools"></i>
+          Histórico de consertos
+          (<%= consertos.length %>)
+        </h2>
+
+        <% if (consertos.length === 0) { %>
+          <p class="sem-historico">
+            Este cliente ainda não possui consertos registrados.
+          </p>
+       <% } else { %>
+  <div class="historico-lista">
+    <% consertos.forEach(conserto => { %>
+      <article class="historico-item">
+              <div class="historico-cabecalho">
+                <strong>
+                  #<%= conserto.codigo %> —
+                  <%= conserto.tipo_conserto || 'Conserto' %>
+                </strong>
+              </div>
+
+              <p>
+                <strong>Aparelho:</strong>
+                <%= [conserto.tipo_aparelho, conserto.marca, conserto.modelo]
+                  .filter(Boolean).join(' ') || 'Não informado' %>
+              </p>
+
+              <p>
+                <strong>Problema:</strong>
+                <%= conserto.descricao_problema || 'Não informado' %>
+              </p>
+
+              <p>
+                <strong>Data de abertura:</strong>
+                <%= conserto.data_solicitada
+                  ? new Date(conserto.data_solicitada).toLocaleDateString('pt-BR')
+                  : 'Não informada' %>
+              </p>
+
+              <p>
+                <strong>Previsão de entrega:</strong>
+                <%= conserto.data_prometida
+                  ? new Date(conserto.data_prometida).toLocaleDateString('pt-BR')
+                  : 'Não informada' %>
+              </p>
+
+              <p>
+                <strong>Valor:</strong>
+                <%= conserto.valor != null
+                  ? Number(conserto.valor).toLocaleString('pt-BR', { style:'currency', currency:'BRL' })
+                  : 'Não informado' %>
+              </p>
+
+              <a class="link-conserto"
+                 href="/admin/consertos/<%= conserto.codigo %>">
+                <i class="bi bi-eye"></i> Ver detalhes do conserto
+              </a>
+            </article>
+            <% }) %>
+        </div>
+        <% } %>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const parametros = new URLSearchParams(window.location.search);
+
+    if (parametros.get('salvo') === '1') {
+      const aviso = document.createElement('div');
+      aviso.className = 'mensagem-sucesso';
+      aviso.textContent = 'Dados do cliente atualizados com sucesso.';
+
+      const container = document.querySelector('.detalhes-container');
+      const topo = document.querySelector('.detalhes-topo');
+
+      container.insertBefore(aviso, topo.nextSibling);
+    }
+  </script>
+</body>
+</html>

@@ -1,149 +1,165 @@
-body{
-margin:0;
-font-family:Arial, Helvetica, sans-serif;
-background:white;
+/* =====================================================================
+   RP CELULARES — ADMIN
+   Índice
+     1. Base
+     2. Navbar
+     3. Menu lateral
+     4. Área principal
+     5. Formulários (cadastro de cliente / conserto)
+     6. Mensagens, busca de cliente e aviso flutuante
+     7. Clientes: lista
+     8. Consertos: listagens
+     9. Clientes: detalhes + histórico
+    10. Consertos: painel geral
+    11. Consertos: avisos importantes
+    12; Consertos: detalhes
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+
+/* ---------- 1. BASE ---------- */
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: white;
 }
 
-/* ÁREA DE TRABALHO */
-h1{
-  font-family: Arial;
-  text-align: center;
-  font-size: 20px;
-  margin-top: 0;
-  margin-bottom: 2px;
+h1 {
+    text-align: center;
+    font-size: 20px;
+    margin-top: 0;
+    margin-bottom: 2px;
 }
 
-#linhaPainel{
-  margin: 5px 100px 16px 100px; /* cima, direita, baixo, esquerda */
-  border: none;
-  height:1.5px;
-  background:#151414;
+#linhaPainel {
+    margin: 5px 100px 16px; /* cima | laterais | baixo */
+    border: none;
+    height: 1.5px;
+    background: #151414;
 }
 
 
-/* NAVBAR */
-.navbar{
-    display:flex;
-    align-items:center;
+/* ---------- 2. NAVBAR ---------- */
+.navbar {
+    display: flex;
+    align-items: center;
     background: linear-gradient(to right, #1c3426, #649e6b);
-    color:white;
-    padding:2px 20px;
+    color: white;
+    padding: 2px 20px;
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;      
+    right: 0;
     z-index: 1000;
+    height: 56px;            
+    box-sizing: border-box;
 }
 
-.logo{
-font-size:25px;
-font-weight:bold;
-margin-right:40px;
-
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+    margin-right: 40px;
 }
 
 .nav-buttons {
     display: flex;
-    gap: 10px; 
+    gap: 10px;
 }
 
 .nav-buttons a {
+    display: inline-block;
     color: white;
     text-decoration: none;
     font-weight: 500;
-    padding: 4px 8px; 
+    padding: 4px 8px;
     border-radius: 30pt;
     transition: background-color 0.3s;
-    display: inline-block; 
 }
 
-.nav-buttons a:hover {
+.nav-buttons a:hover,
+.nav-buttons a.ativo {
     background: #357640;
 }
 
-.search-area{
+.search-area {
     position: relative;
     margin-left: auto;
     margin-right: 80px;
 }
 
-
-.search-area input{
+.search-area input {
     width: 280px;
     padding: 8px 35px 8px 12px;
-
-    height: auto;
-    min-height: 0;
-
-    border-radius: 20px;
-    border: none;
-
     box-sizing: content-box;
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 13.3333px;
-    font-weight: normal;
-    line-height: normal;
-
+    border: none;
+    border-radius: 20px;
     background: white;
     color: #333;
+    font-family: inherit;
+    font-size: 13px;
 }
 
-
-.search-area input:focus{
+.search-area input:focus {
     outline: none;
 }
 
-
-.search-icon{
+.search-icon {
     position: absolute;
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-
     color: #555;
     font-size: 16px;
-
     pointer-events: none;
 }
 
-.user{
-display:flex;
-align-items:center;
-margin-right: 5px;
-gap:10px;
-}
-
-.user-photo{
-width:35px;
-height:35px;
-border-radius:50%;
-object-fit:cover;
-}
-
-/* Container principal do menu do usuário */
+/* Foto + nome do admin (sempre colado à direita da navbar) */
 .user-menu-container {
     position: relative;
+    margin-left: auto;
     padding: 10px;
     cursor: pointer;
 }
 
-/* O menu escondido */
+/* Quando existe campo de busca, é ele quem empurra tudo para a direita */
+.search-area + .user-menu-container {
+    margin-left: 0;
+}
+
+.user {
+    display: flex;
+    align-items: center;
+    margin-right: 5px;
+    gap: 10px;
+}
+
+.user-photo {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 .user-dropdown {
     display: none;
     position: absolute;
-    top: 100%; 
+    top: 100%;
     right: 0;
-    background-color: white;
     min-width: 180px;
-    box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+    background-color: white;
+    border: 1px solid #eee;
     border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     overflow: hidden;
-    border: 1px solid #eee;
 }
 
-/* Links dentro do menu */
+.user-icon {
+    font-size: 23px;
+    line-height: 1;
+}
+
 .user-dropdown a {
     display: block;
     padding: 12px 16px;
@@ -168,16 +184,15 @@ object-fit:cover;
 }
 
 
-
-/* MENU LATERAL */
+/* ---------- 3. MENU LATERAL ---------- */
 .sidebar {
     position: fixed;
     top: 56px;
     left: 0;
     width: 235px;
     height: calc(100vh - 56px);
-    background: #f4f7e9;
     padding-top: 20px;
+    background: #f4f7e9;
     overflow-y: auto;
 }
 
@@ -196,40 +211,32 @@ object-fit:cover;
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 20px;
-    text-decoration: none;
-    color: #333;
     width: 100%;
-    transition: background-color 0.2s;
+    padding: 12px 20px;
     box-sizing: border-box;
+    color: #333;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: background-color 0.2s;
 }
 
 .sidebar li a i {
-    font-size: 18px;
     width: 20px;
     min-width: 20px;
+    font-size: 18px;
     text-align: center;
-    color: #333;
 }
 
 .sidebar li a span {
     white-space: nowrap;
-    color: #333;
 }
 
-.sidebar li a:hover {
+.sidebar li a:hover,
+.sidebar-consertos li.active a {
     background-color: rgba(162, 207, 158, 0.3);
 }
 
-.sidebar li a{
-    line-height: 1.2;
-}
-
-.sidebar li.active a i {
-    color: #333;
-}
-
-.sidebar hr{
+.sidebar hr {
     margin: 15px 20px;
     border: none;
     height: 1.3px;
@@ -237,63 +244,197 @@ object-fit:cover;
     opacity: 1;
 }
 
-/* CATEGORIAS DO MENU */
-.categoria-item {
-    position: relative;
+
+/* ---------- 4. ÁREA PRINCIPAL ---------- */
+/* Telas COM menu lateral: deixa o espaço da sidebar à esquerda */
+.content {
+    margin-left: 240px;
+    margin-top: 56px;
+    padding: 30px;
+}
+
+/* Telas SEM menu lateral (clientes, detalhes do cliente):
+   o conteúdo fica centralizado, sem reservar espaço à esquerda */
+.content.content-centralizado,
+.content.pagina-detalhes-cliente {
+    width: 100%;
+    max-width: 1200px;
+    margin: 56px auto 0;
+    box-sizing: border-box;
+}
+
+/* Tela de avisos: sem menu lateral e ocupando a largura toda */
+.content.avisos-pagina {
+    width: 100%;
+    max-width: none;
+    margin: 56px 0 0;
+    padding: 40px 0;
+    box-sizing: border-box;
+}
+
+
+/* ---------- 5. FORMULÁRIOS ---------- */
+/* Caixa externa clara que envolve os cards */
+.form-wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 12px;
+    background: #f4f7e9;
+    border-radius: 14px;
+}
+
+.form-wrapper form {
     display: flex;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-}
-
-.categoria-item a {
-    flex: 1;
-    min-width: 0;
-}
-
-.btn-excluir-categoria {
-    display: none !important;
-    background: none;
-    border: none;
-    color: #4a4a4a;
-    cursor: pointer;
-    padding: 8px 16px;
-    font-size: 15px;
-    margin: 0;
-    width: auto;
-    height: auto;
-    line-height: normal;
-    flex-shrink: 0;
-}
-
-.categoria-item:hover .btn-excluir-categoria {
-    display: block !important;
-}
-
-.btn-excluir-categoria:hover {
-    color: #c0392b;
-}
-
-/* AREA PRINCIPAL */
-.content{
-    margin-left:240px;
-    margin-top: 56px;   
-    padding:30px;
-}
-
-
-/* ------ ÁREA CONSERTOS: CADASTRO ------ */
-.form-grid-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    flex-direction: column;
     gap: 16px;
 }
 
+/* Cada bloco: "Dados do cliente", "Endereço", "Dados do conserto"... */
+.form-wrapper .form-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 14px 18px 22px;
+    border: 1px solid #a9ada0;
+    border-radius: 12px;
+}
+
+.form-card h3 {
+    margin: 0 0 -2px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+}
+
+/* Os campos ficam levemente recuados em relação ao título do card */
+.form-wrapper .form-card > :not(h3) {
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.form-grid-2,
+.form-grid-3 {
+    display: grid;
+    gap: 16px 20px;
+}
+
+.form-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.form-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.campo label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #222;
+}
+
+.obrigatorio {
+    color: #e5484d;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 14px;
+    border: 1px solid #8f9188;
+    border-radius: 12px;
+    background: transparent;
+    color: #222;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.campo input,
+.campo select {
+    height: 38px;
+}
+
+.campo textarea {
+    padding: 10px 14px;
+    resize: vertical;
+    line-height: 1.4;
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+    color: #6b6e66;
+    opacity: 1;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+    outline: none;
+    border-color: #649e6b;
+    box-shadow: 0 0 0 3px rgba(100, 158, 107, 0.25);
+}
+
+/* Botões (formulários e detalhes do cliente) */
+.form-botoes,
+.acoes-formulario {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.form-botoes {
+    justify-content: flex-end;
+    padding: 0 8px 4px;
+}
+
+.acoes-formulario {
+    margin-top: 24px;
+}
+
+.btn-salvar,
+.btn-voltar,
+.btn-cancelar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-salvar { background: #649e6b; color: white; }
+.btn-salvar:hover { background: #4f7854; }
+
+.btn-voltar,
+.btn-cancelar { background: #e9ecef; color: #333; }
+.btn-voltar:hover,
+.btn-cancelar:hover { background: #dfe3e6; }
+
+@media (max-width: 700px) {
+    .form-grid-2,
+    .form-grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ---------- 6. MENSAGENS, BUSCA DE CLIENTE E AVISO FLUTUANTE ---------- */
 .mensagem {
+    max-width: 960px;
+    margin: 0 auto 16px;
     padding: 12px 16px;
     border-radius: 6px;
     font-size: 13px;
-    margin-bottom: 16px;
+    box-sizing: border-box;
 }
 
 .mensagem--erro {
@@ -306,6 +447,15 @@ object-fit:cover;
     background: #e6f4ea;
     border: 1px solid #3E7F57;
     color: #16301F;
+}
+
+/* Mensagem simples (detalhes do cliente) */
+.mensagem-sucesso {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    background: #e6f4ea;
+    color: #16301f;
 }
 
 /* Barra de busca de cliente */
@@ -345,7 +495,7 @@ object-fit:cover;
     border-radius: 20px;
     background: #fff;
     font-size: 13px;
-    font-family: 'Poppins', sans-serif;
+    font-family: inherit;
     box-sizing: border-box;
 }
 
@@ -415,7 +565,7 @@ object-fit:cover;
     color: #16301F;
     font-size: 12px;
     cursor: pointer;
-    font-family: 'Poppins', sans-serif;
+    font-family: inherit;
 }
 
 .btn-limpar-cliente:hover {
@@ -485,480 +635,29 @@ object-fit:cover;
 }
 
 
-/* ------ AREA PRODUTOS ------ */
-.produtos-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
-    gap:20px;
-}
-
-.produto-card{
-    background:#f4f7e9;
-    border-radius:8px;
-    padding:16px;
-    text-align:center;
-}
-
-.produto-card img{
-    width:100%;
-    height:140px;
-    object-fit:contain;
-    margin-bottom:-5px;
-}
-
-.produto-nome{
-    font-size:13px;
-    font-weight:600;
-    color:#222;
-    margin-top: 10px;
-    min-height:34px;
-    text-align:center;
-}
-
-.produto-linha{
-    border:none;
-    border-top:1px solid #8f8e8e;
-    margin-top: -22px;
-    margin-bottom: 8px;
-}
-
-.produto-preco-linha{
-    display:flex;
-    justify-content:center;
-    align-items:baseline;
-    gap:8px;
-    margin-bottom:2px;
-}
-
-.preco-riscado{
-    font-size:14px;
-    color:#8f8e8e;
-    text-decoration:line-through;
-}
-
-.preco-atual{
-    font-size:14px;
-    font-weight:700;
-    color:#16301F;
-}
-
-.produto-parcelas{
-    display:block;
-    text-align:center;
-    font-size:11px;
-    color:#4a4a4a;
-    margin-bottom:12px;
-}
-
-.produto-acoes{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-}
-
-.btn-comprar{
-    flex:1;
-    height:36px;
-    border:none;
-    border-radius:20px;
-    background:#77b95a;
-    color:#fff;
-    font-size:14px;
-    font-weight:700;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-}
-
-.btn-comprar i{
-    font-size:16px;
-}
-
-.btn-comprar:hover{
-    background:#5f9a47;
-}
-
-.btn-editar-produto{
-    flex-shrink:0;
-    background:none;
-    border:none;
-    color:#333;
-    text-decoration:none;
-    font-size:20px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-}
-
-.btn-editar-produto:hover{
-    color:#16301F;
-}
-
-.produto-sem-estoque{
-    display:inline-block;
-    margin-top:8px;
-    background:#fdecec;
-    color:#a61b1b;
-    font-size:11px;
-    font-weight:600;
-    padding:3px 8px;
-    border-radius:4px;
-}
-
-.sem-produtos{
-    color:#666;
-    font-size:14px;
-    padding:20px 0;
-}
-/* CARROSSEL EDITÁVEL */
-.container-banner-admin{
-    position:relative;
-    margin-bottom:44px;
-}
-
-.container-banner-admin .carousel-item img{
-    border-radius:8px;
-    max-height:330px;
-    object-fit:cover;
-}
-
-.container-banner-admin .banner-item{
-    position:relative;
-}
-
-.form-excluir-banner{
-    position:absolute;
-    top:12px;
-    right:12px;
-    z-index:10;
-    display:none;
-}
-
-#carouselAdmin:hover .form-excluir-banner{
-    display:block;
-}
-
-.btn-excluir-banner{
-    background:rgba(0,0,0,0.55);
-    border:none;
-    color:#fff;
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    cursor:pointer;
-    font-size:14px;
-}
-
-.btn-excluir-banner:hover{
-    background:rgba(0,0,0,0.8);
-}
-
-.container-banner-admin .carousel-indicators{
-    bottom:-30px;
-    margin-bottom:0;
-}
-
-.btn-adicionar-banner{
-    margin-top:10px;
-    background:none;
-    border:1px dashed #8f8e8e;
-    border-radius:6px;
-    padding:8px 14px;
-    font-size:13px;
-    color:#333;
-    cursor:pointer;
-}
-
-.btn-adicionar-banner:hover{
-    background:#f4f7e9;
-}
-
-.banner-vazio{
-    border:1px dashed #8f8e8e;
-    border-radius:8px;
-    padding:20px;
-    text-align:center;
-    color:#666;
-    font-size:13px;
-    margin-bottom:10px;
-}
-
-.banner-vazio img{
-    width:100%;
-    max-height:290px;
-    object-fit:contain;
-    display:block;
-    border-radius:6px;
-}
-
-
-/* Formulário - ADICIONAR PRODUTO */
-.form-card{
-    background:#f4f7e9;
-    border:1px solid #535353;
-    border-radius:8px;
-    padding:20px 24px;
-    margin-bottom:20px;
-}
-
-.form-card h3{
-    font-size:15px;
-    color:#16301F;
-    margin-bottom:16px;
-}
-
-.campo{
-    display:flex;
-    flex-direction:column;
-    margin-bottom:14px;
-}
-
-.campo label{
-    font-size:13px;
-    font-weight:600;
-    margin-bottom:6px;
-    color:#333;
-}
-
-.campo .obrigatorio{
-    color:#c0392b;
-}
-
-.campo input,
-.campo select,
-.campo textarea{
-    height:40px;
-    background:#f4f7e9;
-    border:1px solid #535353;
-    border-radius:6px;
-    padding:0 12px;
-    font-size:13px;
-    font-family:'Poppins',sans-serif;
-}
-.campo input[type="file"]{
-    height:auto;
-    padding:8px 12px;
-    display:flex;
-    align-items:center;
-}
-
-.campo textarea{
-    height:auto;
-    padding:10px 12px;
-    resize:vertical;
-}
-
-.form-wrapper{
-    background: #f4f7e9;
-    border: 1px solid #f4f7e9;   
-    border-radius: 10px;
-    padding: 15px;
-}
-
-.form-grid-2{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:16px;
-}
-
-.form-botoes{
-    display:flex;
-    justify-content:flex-end;
-    gap:12px;
-    margin-top:10px;
-}
-
-.btn-cancelar{
-    padding:10px 20px;
-    border:1px solid #535353;
-    border-radius:6px;
-    color:#333;
-    text-decoration:none;
-    font-size:13px;
-}
-
-.btn-cancelar:hover{
-    background: #dcd9d9;
-}
-
-.btn-salvar{
-    padding:10px 20px;
-    border:none;
-    border-radius:6px;
-    background:#3E7F57;
-    color:#fff;
-    font-size:13px;
-    font-weight:600;
-    cursor:pointer;
-}
-
-.btn-salvar:hover{
-    background:#234228;
-}
-
-/* MODAL - ADICIONAR CATEGORIA */
-.modal-overlay{
-    display:none;
-    position:fixed;
-    top:0; left:0; right:0; bottom:0;
-    background:rgba(20,21,15,0.5);
-    z-index:2000;
-    align-items:center;
-    justify-content:center;
-}
-
-.modal-overlay.ativo{
-    display:flex;
-}
-
-.modal-box{
-    background:#fff;
-    width:100%;
-    max-width:420px;
-    border-radius:10px;
-    padding:24px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.2);
-}
-
-.modal-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:18px;
-}
-
-.modal-header h2{
-    font-size:18px;
-    color:#16301F;
-    margin:0;
-}
-
-.modal-fechar{
-    background:none;
-    border:none;
-    font-size:16px;
-    color:#666;
-    cursor:pointer;
-}
-
-.modal-fechar:hover{
-    color:#16301F;
-}
-
-.modal-botoes{
-    display:flex;
-    justify-content:flex-end;
-    gap:12px;
-    margin-top:16px;
-}
-
-/* MODAL - EXCLUIR CATEGORIA */
-.categoria-item{
-    position:relative;
-    display:flex;
-    align-items:center;
-}
-
-.categoria-item a{
-    flex:1;
-}
-
-.btn-excluir-categoria{
-    display:none;
-    background:none;
-    border:none;
-    color:#4a4a4a;
-    cursor:pointer;
-    padding:8px 16px;
-    font-size:15px;
-}
-
-.categoria-item:hover .btn-excluir-categoria{
-    display:block;
-}
-
-.btn-excluir{
-    padding:10px 20px;
-    border:none;
-    border-radius:6px;
-    background:#c0392b;
-    color:#fff;
-    font-size:13px;
-    font-weight:600;
-    cursor:pointer;
-}
-
-.btn-excluir:hover{
-    background:#96281b;
-}
-
-/* Mecanismo de vizualizar senha */
-.campo-senha{
-    position:relative;
-    display:flex;
-    align-items:center;
-}
-
-.campo-senha input{
-    width:100%;
-    padding-right:40px;
-}
-
-.btn-olho{
-    position:absolute;
-    right:10px;
-    background:none;
-    border:none;
-    color:#666;
-    cursor:pointer;
-    font-size:15px;
-}
-
-.btn-olho:hover{
-    color:#333;
-}
-
-
-/* ------ ÁREA CLIENTES ------ */
-.content {
-    margin-left: 235px;
-    margin-right: 0;
-    width: auto;
-    max-width: none;
-    padding: 40px 30px;
-    box-sizing: border-box;
-}
-
-/* Tela Clientes centralizada */
-.content.content-centralizado {
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    max-width: 1300px;
-}
-
+/* ---------- 7. CLIENTES: LISTA ---------- */
 .titulo-pagina {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 20px;
+    justify-content: center;
+    min-height: 44px; /* altura do botão, para ele não encostar na linha */
 }
 
 .titulo-pagina h1 {
     margin: 0;
-    text-align: center;
 }
 
 .btn-adicionar-cliente {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 10px 18px;
-    background-color: #3e8d5a;
+    background-color: #649e6b;
     color: white;
     text-decoration: none;
     border-radius: 6px;
@@ -968,90 +667,97 @@ object-fit:cover;
 }
 
 .btn-adicionar-cliente:hover {
-    background-color: #2c5c32;
+    background-color: #4f7854;
 }
 
-.clientes-lista{
-    display:flex;
-    flex-direction:column;
-    gap:16px;
+@media (max-width: 800px) {
+    .titulo-pagina {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn-adicionar-cliente {
+        position: static;
+        transform: none;
+    }
 }
 
-.cliente-card{
-    background:#f4f7e9;
-    border-radius:8px;
-    padding:18px 22px;
-        align-items: center;
+.clientes-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.cliente-topo{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:10px;
+.cliente-card {
+    background: #f4f7e9;
+    border-radius: 8px;
+    padding: 18px 22px;
 }
 
-.cliente-nome-codigo strong{
-    font-size:15px;
-    color:#222;
-    margin-right:8px;
+.cliente-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
-.cliente-codigo{
-    font-size:12px;
-    color:#3E7F57;
-    font-weight:600;
+.cliente-nome-codigo strong {
+    font-size: 15px;
+    color: #222;
+    margin-right: 8px;
 }
 
-.btn-ver-detalhes{
-    background:#fcfcfc;
-    border:1px solid #dcdfd6;
-    border-radius:8px;
-    padding:6px 14px;
-    font-size:12px;
-    color:#333;
-    text-decoration:none;
+.cliente-codigo {
+    font-size: 12px;
+    color: #3E7F57;
+    font-weight: 600;
 }
 
-.btn-ver-detalhes:hover{
-    background:#e8ece0;
+.btn-ver-detalhes {
+    background: #fcfcfc;
+    border: 1px solid #dcdfd6;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #333;
+    text-decoration: none;
 }
 
-.cliente-contato{
-    display:flex;
-    gap:30px;
-    font-size:13px;
-    color:#333;
-    margin-bottom:6px;
+.btn-ver-detalhes:hover {
+    background: #e8ece0;
 }
 
-.cliente-endereco{
-    font-size:13px;
-    color:#555;
-    margin-bottom:10px;
+.cliente-contato {
+    display: flex;
+    gap: 30px;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 6px;
 }
 
-.cliente-linha{
-    border:none;
-    border-top:1px solid #c9d1c0;
-    margin:10px 0;
-}
-
-.cliente-servico{
-    font-size:13px;
-    color:#333;
-}
-
-
-/* ------ ÁREA CONSERTOS: LISTAGENS ------ */
 .cliente-contato i {
     margin-right: 4px;
 }
 
-.sidebar-consertos li.active a {
-    background-color: rgba(162, 207, 158, 0.3);
+.cliente-endereco {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 10px;
 }
 
+.cliente-linha {
+    border: none;
+    border-top: 1px solid #c9d1c0;
+    margin: 10px 0;
+}
+
+.cliente-servico {
+    font-size: 13px;
+    color: #333;
+}
+
+
+/* ---------- 8. CONSERTOS: LISTAGENS ---------- */
 .conserto-status {
     display: inline-block;
     padding: 2px 10px;
@@ -1061,17 +767,10 @@ object-fit:cover;
     vertical-align: middle;
 }
 
-.conserto-status--pendente {
-    background: #fff1cc;
-    color: #8a5d00;
-}
+.conserto-status--pendente  { background: #fff1cc; color: #8a5d00; }
+.conserto-status--concluido { background: #d6efdc; color: #1f6b3a; }
 
-.conserto-status--concluido {
-    background: #d6efdc;
-    color: #1f6b3a;
-}
-
-/* Cards de conserto (altura) */
+/* Cards de conserto (mais baixos que os de cliente) */
 .clientes-lista.conserto-lista {
     gap: 10px;
 }
@@ -1080,24 +779,11 @@ object-fit:cover;
     padding: 10px 22px;
 }
 
-.conserto-card .cliente-topo {
-    margin-bottom: 4px;
-}
+.conserto-card .cliente-topo       { margin-bottom: 4px; }
+.conserto-card .btn-ver-detalhes   { padding: 4px 12px; }
+.conserto-card .cliente-contato    { margin-bottom: 0; }
+.conserto-card .cliente-linha      { margin: 6px 0; }
 
-.conserto-card .btn-ver-detalhes {
-    padding: 4px 12px;
-}
-
-.conserto-card .cliente-contato {
-    margin-bottom: 0;
-}
-
-.conserto-card .cliente-linha {
-    margin: 6px 0;
-}
-
-
-/* ------ ÁREA CONSERTOS: DESTACADOS ------ */
 .conserto-acoes {
     display: flex;
     align-items: center;
@@ -1115,16 +801,135 @@ object-fit:cover;
     transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.btn-estrela.ativa {
-    color: #7d7d7b;
+.btn-estrela.ativa     { color: #7d7d7b; }
+.btn-estrela:disabled  { opacity: 0.5; cursor: wait; }
+
+
+/* ---------- 9. CLIENTES: DETALHES + HISTÓRICO ---------- */
+.detalhes-container {
+    width: 100%;
 }
 
-.btn-estrela:disabled {
-    opacity: 0.5;
-    cursor: wait;
+.detalhes-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
 }
 
-/* ------ ÁREA CONSERTOS: PAINEL GERAL ------ */
+.detalhes-topo h1 {
+    margin: 0;
+    text-align: left;
+}
+
+.detalhes-secao {
+    margin-bottom: 24px;
+    padding: 24px;
+    background: #f4f7e9;
+    border-radius: 12px;
+}
+
+.detalhes-secao h2 {
+    margin: 0 0 20px;
+    font-size: 18px;
+    color: #222;
+}
+
+.detalhes-secao .form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px 20px;
+}
+
+.historico-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.historico-item {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px 24px;
+    align-items: start;
+    padding: 12px 22px 14px;
+    background: #fdfdfd;
+    border: 1px solid #d9dec9;
+    border-radius: 8px;
+}
+
+.historico-cabecalho {
+    grid-column: 1 / -1;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e3e7d6;
+    font-size: 14px;
+}
+
+.historico-item p {
+    margin: 0;
+    font-size: 13px;
+    color: #333;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.historico-item p strong {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7062;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.historico-item p:nth-of-type(2) {
+    grid-column: span 2;
+}
+
+.historico-item .link-conserto {
+    grid-column: 4;
+    justify-self: end;
+    align-self: end;
+    padding: 4px 12px;
+    background: #fcfcfc;
+    border: 1px solid #dcdfd6;
+    border-radius: 8px;
+    color: #333;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.historico-item .link-conserto:hover {
+    background: #e8ece0;
+}
+
+.sem-historico {
+    padding: 12px 0;
+    font-size: 13px;
+    color: #555;
+}
+
+@media (max-width: 1000px) {
+    .detalhes-secao .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .historico-item            { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .historico-item p:nth-of-type(2) { grid-column: 1 / -1; }
+    .historico-item .link-conserto   { grid-column: 2; }
+}
+
+@media (max-width: 700px) {
+    .detalhes-secao { padding: 16px; }
+    .detalhes-secao .form-grid { grid-template-columns: 1fr; }
+    .detalhes-topo { align-items: flex-start; }
+    .historico-item { grid-template-columns: 1fr; }
+    .historico-item .link-conserto { grid-column: 1; justify-self: start; }
+}
+
+
+/* ------ 10. ÁREA CONSERTOS: PAINEL GERAL ------ */
 .painel-topo {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
@@ -1192,21 +997,13 @@ object-fit:cover;
     justify-content: center;
     width: 44px;
     height: 44px;
-    border-radius: 50%;
-    background: #488a4f;
-    color: #fff;
-    font-size: 20px;
-}
-
-.painel-aviso--alerta .painel-aviso-icone {
-    background: #b3402e;
 }
 
 .painel-vazio {
     margin: 0;
     padding: 10px 0;
     font-size: 14px;
-    color: #efefef;
+    color: #777;
 }
 
 /* Gráfico */
@@ -1309,7 +1106,7 @@ object-fit:cover;
     background: #f4f7e9;
     border: 1px solid #535353;
     border-radius: 6px;
-    font-family: 'Poppins', sans-serif;
+    font-family: inherit;
     font-size: 14px;
     box-sizing: border-box;
     resize: vertical;
@@ -1332,7 +1129,7 @@ object-fit:cover;
 .painel-notas-salvar {
     padding: 7px 16px;
     border-radius: 6px;
-    font-family: 'Poppins', sans-serif;
+    font-family: inherit;
     font-size: 13px;
     cursor: pointer;
 }
@@ -1364,11 +1161,6 @@ object-fit:cover;
     }
 }
 
-/* ------ ÁREA CONSERTOS: AVISOS IMPORTANTES (ícones do painel) ------ */
-.painel-aviso-icone,
-.painel-aviso--alerta .painel-aviso-icone {
-    background: transparent;
-}
 
 .painel-aviso-icone img {
     width: 44px;
@@ -1376,18 +1168,8 @@ object-fit:cover;
     display: block;
 }
 
-.navbar--sem-busca .user-menu-container {
-    margin-left: auto;
-}
 
-.nav-buttons a.ativo {
-    background: #357640;
-}
-
-.avisos-pagina {
-    font-family: 'Poppins', Arial, Helvetica, sans-serif;
-}
-
+/* ---------- 11. CONSERTOS: AVISOS IMPORTANTES ---------- */
 .avisos-cabecalho {
     display: flex;
     align-items: center;
@@ -1407,7 +1189,6 @@ object-fit:cover;
 
 .avisos-titulo h1 {
     margin: 0;
-    font-family: 'Poppins', Arial, Helvetica, sans-serif;
     font-size: 18px;
     font-weight: 600;
     color: #222;
@@ -1417,81 +1198,6 @@ object-fit:cover;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #222;
-    text-decoration: none;
-}
-
-/* Filtro */
-.avisos-filtro {
-    position: absolute;
-    right: 40px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.avisos-filtro-botao {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    border: 1px solid #333;
-    border-radius: 8px;
-    background: #fff;
-    color: #222;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-}
-
-.avisos-filtro-botao:hover {
-    background: #f5f5f5;
-}
-
-.avisos-filtro-seta {
-    font-size: 11px;
-}
-
-.avisos-filtro-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: calc(100% + 6px);
-    min-width: 160px;
-    margin: 0;
-    padding: 4px 0;
-    list-style: none;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-}
-
-.avisos-filtro.aberto .avisos-filtro-menu {
-    display: block;
-}
-
-.avisos-filtro-opcao {
-    display: block;
-    width: 100%;
-    padding: 9px 16px;
-    border: none;
-    background: none;
-    text-align: left;
-    font-family: inherit;
-    font-size: 13px;
-    color: #333;
-    cursor: pointer;
-}
-
-.avisos-filtro-opcao:hover {
-    background: #f4f7e9;
-}
-
-.avisos-filtro-opcao.ativo {
-    font-weight: 600;
-    color: #357640;
 }
 
 /* Tabela */
@@ -1560,12 +1266,6 @@ object-fit:cover;
         gap: 12px;
     }
 
-    .avisos-filtro {
-        position: static;
-        transform: none;
-        align-self: flex-end;
-    }
-
     .avisos-colunas,
     .aviso-linha {
         grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) minmax(0, 0.7fr);
@@ -1573,20 +1273,6 @@ object-fit:cover;
         padding-left: 10px;
         padding-right: 10px;
     }
-}
-
-/* Página de avisos sem menu lateral */
-.content.avisos-pagina {
-    margin-left: 0;
-    margin-right: 0;
-    width: 100%;
-    max-width: none;
-    padding: 40px 0;
-    box-sizing: border-box;
-}
-
-.avisos-pagina .avisos-cabecalho {
-    padding: 0 30px;
 }
 
 .avisos-pagina .avisos-tabela {
@@ -1597,4 +1283,162 @@ object-fit:cover;
 .avisos-pagina .aviso-linha {
     padding-left: 40px;
     padding-right: 40px;
+}
+
+/* ---------- 12. CONSERTOS: DETALHES ---------- */
+.detalhes-topo-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.detalhes-topo p .conserto-status {
+    margin-left: 8px;
+}
+
+.detalhes-secao .campo-largo {
+    grid-column: 1 / -1;
+}
+
+.campo input[readonly] {
+    background: #e9ecdc;
+    cursor: default;
+}
+
+.btn-reabrir {
+    background: #649e6b;
+    color: white;
+}
+.btn-reabrir:hover { background: #53875a; }
+
+/* Aviso da regra dos 90 dias (Consertos concluídos) */
+.aviso-historico {
+    margin: 0 0 18px;
+    font-size: 13px;
+    color: #555;
+}
+
+/* =====================================================================
+   RESPONSIVIDADE (sistema interno)
+   ===================================================================== */
+
+@media (max-width: 900px) {
+    .navbar {
+        position: sticky;
+        flex-wrap: wrap;
+        padding: 4px 12px;
+    }
+
+    .logo { margin-right: 16px; }
+
+    .search-area {
+        order: 3;
+        flex: 1 1 100%;
+        margin: 2px 0 8px;
+    }
+
+    .search-area input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .search-area + .user-menu-container { margin-left: auto; }
+    .user-menu-container { padding: 6px; }
+
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        padding: 0;
+        border-bottom: 1px solid #d9dec9;
+    }
+
+    .sidebar ul {
+        display: flex;
+        align-items: stretch;
+        overflow-x: auto;
+    }
+
+    .sidebar li { flex-shrink: 0; }
+
+    .sidebar li a {
+        padding: 12px 14px;
+        gap: 8px;
+    }
+
+    .sidebar hr {
+        flex-shrink: 0;
+        width: 1.3px;
+        height: auto;
+        margin: 10px 6px;
+    }
+
+    .content {
+        margin-left: 0;
+        margin-top: 0;
+        padding: 20px 16px;
+    }
+
+    .content.content-centralizado,
+    .content.pagina-detalhes-cliente {
+        margin: 0 auto;
+    }
+
+    .content.avisos-pagina {
+        margin: 0;
+        padding: 20px 0;
+    }
+
+    #linhaPainel { margin: 5px 0 16px; }
+
+    .aviso-flutuante { top: 100px; }
+
+    .form-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 700px) {
+    .form-grid-2,
+    .form-grid-3 { grid-template-columns: 1fr; }
+
+    .form-wrapper { padding: 8px; }
+    .form-wrapper .form-card { padding: 12px 12px 18px; }
+
+    .user span { display: none; }
+
+    .cliente-card,
+    .conserto-card { padding: 12px 16px; }
+
+    .cliente-topo {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .cliente-contato {
+        flex-wrap: wrap;
+        gap: 4px 20px;
+    }
+
+    .detalhes-topo-acoes { width: 100%; }
+
+    .form-botoes { justify-content: stretch; }
+    .form-botoes > * { flex: 1 1 140px; }
+}
+
+@media (max-width: 600px) {
+    .avisos-pagina .avisos-colunas,
+    .avisos-pagina .aviso-linha {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .avisos-colunas { font-size: 13px; }
+    .aviso-linha { font-size: 12px; }
+    .aviso-tipo { gap: 8px; font-size: 12px; }
+
+    .aviso-icone {
+        width: 28px;
+        height: 28px;
+    }
+
+    .avisos-titulo h1 { font-size: 16px; }
 }

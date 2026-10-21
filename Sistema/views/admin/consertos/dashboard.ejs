@@ -24,19 +24,16 @@
 
     <!-- Área do Admin com Dropdown-->
     <div class="user-menu-container">
-        <div class="user">
-            <img src="<%= usuario.foto || '/images/valentina.jpg' %>" class="user-photo" id="fotoPerfil" alt="Foto do usuário">
-            <span>Admin - Rodrigo </span>
-        </div>
-        
-        <div class="user-dropdown">
-            <a href="#" id="btnMudarFoto">
-                <i class="bi bi-camera-fill"></i> Mudar foto
-            </a>
-            <a href="/logout" class="btn-sair">
-                <i class="bi bi-box-arrow-right"></i> Sair do sistema
-            </a>
-        </div>
+      <div class="user">
+        <i class="bi bi-person-circle user-icon"></i>
+        <span>Admin - Rodrigo</span>
+      </div>
+
+      <div class="user-dropdown">
+        <a href="/logout" class="btn-sair">
+          <i class="bi bi-box-arrow-right"></i> Sair do sistema
+        </a>
+      </div>
     </div>
 
     <!-- FORMULÁRIO ESCONDIDO PARA UPLOAD -->
@@ -237,20 +234,7 @@
 
     
 <script>
-    // Quando clicar no link "Mudar foto"
-    document.getElementById('btnMudarFoto').addEventListener('click', function(e) {
-        e.preventDefault(); 
-        document.getElementById('inputFoto').click(); 
-    });
-
-    // Quando o admin escolher o arquivo na "aba do computador"
-    document.getElementById('inputFoto').addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            document.getElementById('formFoto').submit();
-        }
-    });
-
-        // ---------- BLOCO DE NOTAS ----------
+     // ---------- BLOCO DE NOTAS ----------
     let textoAtual = <%- JSON.stringify(notas).replace(/</g, '\\u003c') %>;
 
     const listaNotas = document.getElementById('listaNotas');
