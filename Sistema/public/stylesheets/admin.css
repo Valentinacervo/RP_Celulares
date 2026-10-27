@@ -1285,6 +1285,13 @@ h1 {
     padding-right: 40px;
 }
 
+/* Mantém a caixa do tamanho de 3 avisos, mesmo com menos (ou nenhum) */
+.painel-avisos-lista,
+.painel-vazio {
+    min-height: 188px;   /* 3 avisos x 60px + 2 espaços de 4px */
+    box-sizing: border-box;
+}
+
 /* ---------- 12. CONSERTOS: DETALHES ---------- */
 .detalhes-topo-acoes {
     display: flex;
