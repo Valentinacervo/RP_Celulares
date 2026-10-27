@@ -1442,3 +1442,11 @@ h1 {
 
     .avisos-titulo h1 { font-size: 16px; }
 }
+
+/* Navbar cresce para caber a barra de pesquisa na 2ª linha (celular/tablet) */
+@media (max-width: 900px) {
+    .navbar {
+        height: auto;
+        min-height: 56px;
+    }
+}
